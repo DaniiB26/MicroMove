@@ -1,3 +1,6 @@
+import Foundation
+import SwiftData
+
 @Model
 final class Progress {
     let id: UUID
