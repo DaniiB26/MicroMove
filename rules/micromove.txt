@@ -1,0 +1,75 @@
+I am building a native iOS app called **MicroMove**, a micro-workout tracker that encourages healthy habits by integrating small bursts of exercise into daily routines. Please activate the **Planner** role and generate the initial `.cursor/scratchpad.md` file according to the Educator-enhanced multi-agent rules.
+
+---
+
+### App Description (Product Owner Perspective)
+
+**MicroMove** is a minimalist iOS app focused on **exercise snacking**—the idea that health benefits can be achieved through short, frequent movements rather than long workout sessions. The app delivers quick exercises, gentle prompts, and lightweight progress tracking that fits into anyone’s routine.
+
+It’s designed to be frictionless: no logins, no heavy routines—just nudges to move and a clear sense of progress.
+
+---
+
+### Core Features
+
+#### Exercise Library
+- Curated list of short, do-anywhere exercises
+- Categorized by:
+  - Body area (e.g., core, shoulders)
+  - Movement type (stretch, strength, cardio)
+  - Duration (1–5 minutes)
+- Visual guides and simple instructions
+
+#### Smart Activity Detection
+- Background monitoring of phone usage/inactivity
+- Customizable reminder rules:
+  - “If inactive for X minutes, suggest movement”
+  - Time-of-day patterns
+  - User-defined quiet hours
+- Taps into contextual triggers (e.g., screen unlock, idle time)
+
+#### Progress Tracking
+- Daily movement log
+- Visual history (calendar or chart)
+- Streaks and achievements
+- Offline-friendly local tracking
+
+#### User Experience
+- SwiftUI interface optimized for minimal distraction
+- Offline use supported
+- Data persistence using SwiftData
+- Built with a clean, testable architecture
+
+---
+
+### Acceptance Criteria
+
+- ✅ User can browse and filter exercises by category or duration
+- ✅ Each exercise includes a title, short description, and visual guide
+- ✅ Inactivity triggers send reminders based on custom user thresholds
+- ✅ Reminders only fire within allowed time ranges and contexts
+- ✅ User can manually mark exercises as done
+- ✅ Completed exercises are logged locally
+- ✅ Daily and weekly movement stats are displayed
+- ✅ Streaks and achievements update correctly
+- ✅ App works offline with SwiftData persistence
+- ✅ SwiftUI UI is performant and responsive
+
+---
+
+### Learning Focus
+
+I want to improve my understanding of:
+- App lifecycle and background activity handling
+- Notification scheduling and logic
+- SwiftUI state and layout management
+- Persistence with SwiftData
+- Building simple, reusable components
+- Testing time-based behavior and streak logic
+
+Please break this down into small, testable tasks with:
+- ✅ Success Criteria  
+- 🎯 Learning Goal  
+- 📘 Educator Notes with supporting concepts and examples  
+
+Do not execute anything yet—only plan.
