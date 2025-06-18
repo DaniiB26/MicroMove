@@ -1,15 +1,18 @@
+import Foundation
+import SwiftData
+
 @Model
 final class Exercise {
-    var id: UUID
+    let id: UUID
     var name: String
     var description: String
-    var type: String
-    var bodyPart: String
+    var type: ExerciseType
+    var bodyPart: BodyPart
     var duration: Int
-    var createdAt: Date
+    let createdAt: Date
     var image: String
 
-    init(name: String, description: String, type: String, bodyPart: String, duration: Int, createdAt: Date, image: String) {
+    init(name: String, description: String, type: ExerciseType, bodyPart: BodyPart, duration: Int, createdAt: Date, image: String) {
         self.name = name
         self.description = description
         self.type = type
