@@ -27,8 +27,8 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 ### Phase 1: Foundation and Data Layer
 - [ ] Task 1: Project Setup and Basic Architecture
   - ✅ Success Criteria
-    - Xcode project created with SwiftUI
-    - Basic folder structure established
+    - Xcode project created with SwiftUI    - done
+    - Basic folder structure established    - done
     - SwiftData models defined
   - 🎯 Learning Goal
     - Understanding iOS app architecture

@@ -10,6 +10,7 @@ final class Exercise {
     var bodyPart: BodyPart
     var duration: Int
     let createdAt: Date
+    var isCompleted: Bool
     var image: String
 
     init(name: String, description: String, type: ExerciseType, bodyPart: BodyPart, duration: Int, createdAt: Date, image: String) {
@@ -19,6 +20,7 @@ final class Exercise {
         self.bodyPart = bodyPart
         self.duration = duration
         self.createdAt = createdAt
+        self.isCompleted = isCompleted
         self.image = image
     }
 }
