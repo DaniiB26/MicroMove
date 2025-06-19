@@ -1,10 +1,3 @@
-//
-//  MicroMoveApp.swift
-//  MicroMove
-//
-//  Created by Daniel Bengala on 18/06/2025.
-//
-
 import SwiftUI
 import SwiftData
 
@@ -12,10 +5,14 @@ import SwiftData
 struct MicroMoveApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Exercise.self,
+            Achievement.self,
+            ActivityLog.self,
+            Progress.self,
+            UserPreferences.self,
+            WorkoutSession.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
