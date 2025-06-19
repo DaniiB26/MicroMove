@@ -42,6 +42,7 @@ class ExercisesViewModel: ObservableObject {
     func deleteExercise(_ exercise: Exercise) {
         do {
             modelContext.delete(exercise)
+            try modelContext.save()
             fetchExercises()
         } catch {
             print("Error deleting exercise: \(error)")
