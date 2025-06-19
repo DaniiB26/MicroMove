@@ -17,14 +17,15 @@ final class ActivityLog {
         case reminderTriggered
     }
     
-    enum ActivityContext: String {
+    enum ActivityDayContext: String {
         case morning
         case afternoon
         case evening
         case night
     }
 
-    init(timestamp: Date, type: ActivityType, duration: Int, dayContext: ActivityDayContext) {
+    init(id: UUID, timestamp: Date, type: ActivityType, duration: Int, dayContext: ActivityDayContext) {
+        self.id = id
         self.timestamp = timestamp
         self.type = type
         self.duration = duration

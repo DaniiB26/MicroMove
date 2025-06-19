@@ -5,7 +5,7 @@ import SwiftData
 final class Achievement {
     let id: UUID
     var title: String
-    var description: String
+    var achievementDesc: String
     var type: AchievementType
     var requirement: Int
     var isUnlocked: Bool
@@ -17,9 +17,10 @@ final class Achievement {
         case totalMinutes
     }
 
-    init(title: String, description: String, type: AchievementType, requirement: Int, isUnlocked: Bool, unlockedAt: Date?) {
+    init(id: UUID, title: String, achievementDesc: String, type: AchievementType, requirement: Int, isUnlocked: Bool, unlockedAt: Date?) {
+        self.id = id
         self.title = title
-        self.description = description
+        self.achievementDesc = achievementDesc
         self.type = type
         self.requirement = requirement
         self.isUnlocked = isUnlocked

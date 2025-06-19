@@ -5,7 +5,7 @@ import SwiftData
 final class Exercise {
     let id: UUID
     var name: String
-    var description: String
+    var exerciseDesc: String
     var type: ExerciseType
     var bodyPart: BodyPart
     var duration: Int
@@ -13,9 +13,10 @@ final class Exercise {
     var isCompleted: Bool
     var image: String
 
-    init(name: String, description: String, type: ExerciseType, bodyPart: BodyPart, duration: Int, createdAt: Date, image: String) {
+    init(id: UUID, name: String, exerciseDesc: String, type: ExerciseType, bodyPart: BodyPart, duration: Int, createdAt: Date, image: String) {
+        self.id = id
         self.name = name
-        self.description = description
+        self.exerciseDesc = exerciseDesc
         self.type = type
         self.bodyPart = bodyPart
         self.duration = duration

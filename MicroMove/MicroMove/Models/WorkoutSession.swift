@@ -10,7 +10,8 @@ final class WorkoutSession {
     var startedAt: Date
     var completedAt: Date
 
-    init(date: Date, duration: Int, exercises: [Exercise], startedAt: Date, completedAt: Date) {
+    init(id: UUID, date: Date, duration: Int, exercises: [Exercise], startedAt: Date, completedAt: Date) {
+        self.id = id
         self.date = date
         self.duration = duration
         self.exercises = exercises

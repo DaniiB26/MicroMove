@@ -9,7 +9,8 @@ final class UserPreferences {
     var quietHoursStart: Date
     var quietHoursEnd: Date
 
-    init(reminderInterval: Int, reminderTime: Date, quietHoursStart: Date, quietHoursEnd: Date) {
+    init(id: UUID, reminderInterval: Int, reminderTime: Date, quietHoursStart: Date, quietHoursEnd: Date) {
+        self.id = id
         self.reminderInterval = reminderInterval
         self.reminderTime = reminderTime
         self.quietHoursStart = quietHoursStart
