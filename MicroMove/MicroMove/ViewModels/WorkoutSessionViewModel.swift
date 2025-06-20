@@ -1,8 +1,13 @@
 import Foundation
 import SwiftData
 
+/// ViewModel for managing WorkoutSession CRUD operations and state.
+@MainActor
 class WorkoutSessionViewModel: ObservableObject {
+    /// The list of all workout sessions, published for UI updates.
     @Published var workoutSessions: [WorkoutSession] = []
+    /// Error message for UI display, if any operation fails.
+    @Published var errorMessage: String?
 
     private var modelContext: ModelContext
 
@@ -11,41 +16,41 @@ class WorkoutSessionViewModel: ObservableObject {
         fetchWorkoutSessions()
     }
 
+    /// Fetches all workout sessions from the data store.
     func fetchWorkoutSessions() {
         do {
             let descriptor = FetchDescriptor<WorkoutSession>()
             workoutSessions = try modelContext.fetch(descriptor)
         } catch {
-            print("Error fetching workout sessions: \(error)")
+            errorMessage = "Error fetching workout sessions: \(error.localizedDescription)"
             workoutSessions = []
         }
     }
 
-    func addWorkoutSession(_ workoutSession: WorkoutSession) {
+    /// Adds a new workout session to the data store and updates the list.
+    func addWorkoutSession(_ session: WorkoutSession) {
+        modelContext.insert(session)
+        workoutSessions.append(session)
+    }
+
+    /// Saves changes to an existing workout session. Call after modifying a session's properties.
+    func updateWorkoutSession(_ session: WorkoutSession) {
         do {
-            try modelContext.insert(workoutSession)
-            fetchWorkoutSessions()
+            try modelContext.save()
+            // Optionally update the item in the array if needed
         } catch {
-            print("Error inserting workout session: \(error)")
+            errorMessage = "Error updating workout session: \(error.localizedDescription)"
         }
     }
 
-    func updateWorkoutSession(_ workoutSession: WorkoutSession) {
+    /// Deletes a workout session from the data store and updates the list.
+    func deleteWorkoutSession(_ session: WorkoutSession) {
         do {
+            modelContext.delete(session)
             try modelContext.save()
-            fetchWorkoutSessions()
+            workoutSessions.removeAll { $0.id == session.id }
         } catch {
-            print("Error updating workout session: \(error)")
-        }
-    }
-
-    func deleteWorkoutSession(_ workoutSession: WorkoutSession) {
-        do {
-            modelContext.delete(workoutSession)
-            try modelContext.save()
-            fetchWorkoutSessions()
-        } catch {
-            print("Error deleting workout session: \(error)")
+            errorMessage = "Error deleting workout session: \(error.localizedDescription)"
         }
     }
 }

@@ -1,8 +1,13 @@
 import Foundation
 import SwiftData
 
+/// ViewModel for managing Exercise CRUD operations and state.
+@MainActor
 class ExercisesViewModel: ObservableObject {
+    /// The list of all exercises, published for UI updates.
     @Published var exercises: [Exercise] = []
+    /// Error message for UI display, if any operation fails.
+    @Published var errorMessage: String?
 
     private var modelContext: ModelContext
 
@@ -11,41 +16,41 @@ class ExercisesViewModel: ObservableObject {
         fetchExercises()
     }
 
+    /// Fetches all exercises from the data store.
     func fetchExercises() {
         do {
             let descriptor = FetchDescriptor<Exercise>()
             exercises = try modelContext.fetch(descriptor)
         } catch {
-            print("Error fetching exercises: \(error)")
+            errorMessage = "Error fetching exercises: \(error.localizedDescription)"
             exercises = []
         }
     }
 
+    /// Adds a new exercise to the data store and updates the list.
     func addExercise(_ exercise: Exercise) {
-        do {
-            try modelContext.insert(exercise)
-            fetchExercises()
-        } catch {
-            print("Error inserting exercise: \(error)")
-        }
+        modelContext.insert(exercise)
+        exercises.append(exercise)
     }
 
+    /// Saves changes to an existing exercise. Call after modifying an exercise's properties.
     func updateExercise(_ exercise: Exercise) {
         do {
             try modelContext.save()
-            fetchExercises()
+            // Optionally update the item in the array if needed
         } catch {
-            print("Error updating exercise: \(error)")
+            errorMessage = "Error updating exercise: \(error.localizedDescription)"
         }
     }
 
+    /// Deletes an exercise from the data store and updates the list.
     func deleteExercise(_ exercise: Exercise) {
         do {
             modelContext.delete(exercise)
             try modelContext.save()
-            fetchExercises()
+            exercises.removeAll { $0.id == exercise.id }
         } catch {
-            print("Error deleting exercise: \(error)")
+            errorMessage = "Error deleting exercise: \(error.localizedDescription)"
         }
     }
 }

@@ -1,8 +1,13 @@
 import Foundation
 import SwiftData
 
+/// ViewModel for managing Progress CRUD operations and state.
+@MainActor
 class ProgressViewModel: ObservableObject {
+    /// The list of all progress records, published for UI updates.
     @Published var progress: [Progress] = []
+    /// Error message for UI display, if any operation fails.
+    @Published var errorMessage: String?
 
     private var modelContext: ModelContext
 
@@ -11,41 +16,41 @@ class ProgressViewModel: ObservableObject {
         fetchProgress()
     }
 
+    /// Fetches all progress records from the data store.
     func fetchProgress() {
         do {
             let descriptor = FetchDescriptor<Progress>()
             progress = try modelContext.fetch(descriptor)
         } catch {
-            print("Error fetching progress: \(error)")
+            errorMessage = "Error fetching progress: \(error.localizedDescription)"
             progress = []
         }
     }
 
-    func addProgress(_ progress: Progress) {
+    /// Adds a new progress record to the data store and updates the list.
+    func addProgress(_ progressRecord: Progress) {
+        modelContext.insert(progressRecord)
+        progress.append(progressRecord)
+    }
+
+    /// Saves changes to an existing progress record. Call after modifying a progress's properties.
+    func updateProgress(_ progressRecord: Progress) {
         do {
-            try modelContext.insert(progress)
-            fetchProgress()
+            try modelContext.save()
+            // Optionally update the item in the array if needed
         } catch {
-            print("Error inserting progress: \(error)")
+            errorMessage = "Error updating progress: \(error.localizedDescription)"
         }
     }
 
-    func updateProgress(_ progress: Progress) {
+    /// Deletes a progress record from the data store and updates the list.
+    func deleteProgress(_ progressRecord: Progress) {
         do {
+            modelContext.delete(progressRecord)
             try modelContext.save()
-            fetchProgress()
+            progress.removeAll { $0.id == progressRecord.id }
         } catch {
-            print("Error updating progress: \(error)")
-        }
-    }
-
-    func deleteProgress(_ progress: Progress) {
-        do {
-            modelContext.delete(progress)
-            try modelContext.save()
-            fetchProgress()
-        } catch {
-            print("Error deleting progress: \(error)")
+            errorMessage = "Error deleting progress: \(error.localizedDescription)"
         }
     }
 }
