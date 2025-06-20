@@ -39,7 +39,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - SwiftData vs CoreData comparison
     - SwiftUI app lifecycle
 
-- [ ] Task 2: Exercise Data Model and Storage
+- [X] Task 2: Exercise Data Model and Storage
   - ✅ Success Criteria
     - Exercise model with all required fields
     - SwiftData persistence layer
@@ -142,7 +142,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 
 ## Project Status Board
 - [X] Task 1: Project Setup and Basic Architecture
-- [ ] Task 2: Exercise Data Model and Storage
+- [X] Task 2: Exercise Data Model and Storage
 - [ ] Task 3: Exercise Library Implementation
 - [ ] Task 4: Activity Detection System
 - [ ] Task 5: Progress Tracking Implementation
@@ -151,7 +151,29 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [ ] Task 8: Testing and Optimization
 
 ## Executor's Feedback or Assistance Requests
-> This section will be populated during development with any blockers or questions that arise.
+> Task 1 completed.
+> - Created a new Xcode project using SwiftUI template.
+> - Established a clear folder structure: Models, Views, ViewModels, Services, Utils, and Assets.xcassets.
+> - Added initial SwiftData models: Exercise, ActivityLog, Progress, Achievement, UserPreferences, WorkoutSession, and supporting enums in ExerciseTypes.swift.
+> - Ensured all models use Codable enums and default values for SwiftData compatibility.
+> - Verified the app builds and runs, and the models compile without errors.
+> - No blockers encountered during setup.
 
 ## Lessons
-> This section will document key learnings, patterns, and solutions discovered during development. 
+> - Setting up a clear folder structure early helps keep the project organized and maintainable.
+> - SwiftData models require enums to conform to Codable and use raw value types for persistence.
+> - Using MVVM architecture from the start makes it easier to scale and test the app.
+> - Documenting each model and property improves clarity for future development.
+> - Initializing models with sensible default values reduces boilerplate and errors.
+
+> Task 2 completed.
+> - Implemented the Exercise model with all required fields and enums conforming to Codable.
+> - Set up SwiftData persistence for Exercise.
+> - Implemented CRUD operations in ExercisesViewModel (add, fetch, update, delete).
+> - Verified by adding, updating, and deleting exercises in the app; all operations work as expected.
+> - No blockers encountered.
+
+> - Enums used in SwiftData models must conform to Codable and have a raw value type (e.g., String).
+> - Only use try/do-catch with functions that actually throw errors.
+> - CRUD operations in SwiftData are straightforward: insert, fetch, update (save), and delete.
+> - Keeping ViewModel logic simple and using @Published keeps the UI in sync with the data store. 
