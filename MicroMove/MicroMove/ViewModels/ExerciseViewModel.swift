@@ -9,11 +9,26 @@ class ExercisesViewModel: ObservableObject {
     /// Error message for UI display, if any operation fails.
     @Published var errorMessage: String?
 
+    @Published var selectedType: ExerciseType? = nil
+
+    @Published var isDurationAscending: Bool = true
+
     private var modelContext: ModelContext
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         fetchExercises()
+    }
+
+    var filteredAndSortedExercises: [Exercise] {
+        let filtered = selectedType == nil
+            ? exercises
+            : exercises.filter { $0.type == selectedType }
+        return filtered.sorted {
+            isDurationAscending
+                ? $0.duration < $1.duration
+                : $0.duration > $1.duration
+        }
     }
 
     /// Fetches all exercises from the data store.
