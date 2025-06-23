@@ -4,6 +4,12 @@ import SwiftData
 /// ViewModel for managing UserPreferences CRUD operations and state.
 @MainActor
 class UserPreferencesViewModel: ObservableObject {
+
+    @Published var reminderInterval: Int = 30
+    @Published var reminderTime: Date = Date()
+    @Published var quietHoursStart: Date = Date()
+    @Published var quietHoursEnd: Date = Date()
+
     /// The user's preferences, published for UI updates.
     @Published var userPreferences: UserPreferences?
     /// Error message for UI display, if any operation fails.
@@ -20,10 +26,42 @@ class UserPreferencesViewModel: ObservableObject {
     func fetchUserPreferences() {
         do {
             let descriptor = FetchDescriptor<UserPreferences>()
-            userPreferences = try modelContext.fetch(descriptor).first
+            if let prefs = try modelContext.fetch(descriptor).first {
+                userPreferences = prefs
+                reminderInterval = prefs.reminderInterval
+                reminderTime = prefs.reminderTime
+                quietHoursStart = prefs.quietHoursStart
+                quietHoursEnd = prefs.quietHoursEnd
+            } else {
+                userPreferences = nil
+            }
         } catch {
             errorMessage = "Error fetching user preferences: \(error.localizedDescription)"
             userPreferences = nil
+        }
+    }
+
+    /// Saves the current values to the user's preferences in the data store.
+    func savePreferences() {
+        if let prefs = userPreferences {
+            prefs.reminderInterval = reminderInterval
+            prefs.reminderTime = reminderTime
+            prefs.quietHoursStart = quietHoursStart
+            prefs.quietHoursEnd = quietHoursEnd
+        } else {
+            let prefs = UserPreferences(
+                reminderInterval: reminderInterval,
+                reminderTime: reminderTime,
+                quietHoursStart: quietHoursStart,
+                quietHoursEnd: quietHoursEnd
+            )
+            modelContext.insert(prefs)
+            userPreferences = prefs
+        }
+        do {
+            try modelContext.save()
+        } catch {
+            errorMessage = "Error saving user preferences: \(error.localizedDescription)"
         }
     }
 
@@ -33,7 +71,7 @@ class UserPreferencesViewModel: ObservableObject {
         userPreferences = preferences
     }
 
-    /// Saves changes to the user's preferences. Call after modifying properties.
+    /// Updates the user's preferences. (Deprecated: use savePreferences instead)
     func updateUserPreferences(_ preferences: UserPreferences) {
         do {
             try modelContext.save()

@@ -6,8 +6,22 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
 
     var body: some View {
-        // Show the exercise list with filtering and sorting
-        ExerciseListView(viewModel: ExercisesViewModel(modelContext: modelContext))
+        NavigationStack {
+            // Show the exercise list with filtering and sorting
+            ExerciseListView(viewModel: ExercisesViewModel(modelContext: modelContext))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(
+                        destination: UserPreferencesView(
+                            viewModel: UserPreferencesViewModel(modelContext: modelContext)
+                        )
+                    ) {
+                        Image(systemName: "gearshape")
+                    }
+                    .accessibilityLabel("User Preferences")
+                }
+            }
+        }
     }
 }
 
