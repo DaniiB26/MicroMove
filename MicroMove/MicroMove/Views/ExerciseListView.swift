@@ -7,6 +7,13 @@ struct ExerciseListView: View {
 
     var body: some View {
         NavigationStack {
+            HStack {
+                Text("Exercises")
+                    .font(.title2)
+                    .bold()
+                    .padding(.leading)
+                Spacer()
+            }
             VStack {
                 HStack {
                     Spacer()
@@ -38,7 +45,7 @@ struct ExerciseListView: View {
                         ExerciseRowView(exercise: exercise)
                     }
                 }
-                .navigationTitle("Exercises")
+                .navigationTitle("Main Menu")
             }
         }
     }
