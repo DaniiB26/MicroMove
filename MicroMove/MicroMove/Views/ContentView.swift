@@ -1,11 +1,12 @@
 import SwiftUI
 import SwiftData
 
+/// The main entry point for the app, displaying the exercise library.
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var exercises: [Exercise] = []
 
     var body: some View {
+        // Show the exercise list with filtering and sorting
         ExerciseListView(viewModel: ExercisesViewModel(modelContext: modelContext))
     }
 }

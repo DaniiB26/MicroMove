@@ -8,9 +8,9 @@ class ExercisesViewModel: ObservableObject {
     @Published var exercises: [Exercise] = []
     /// Error message for UI display, if any operation fails.
     @Published var errorMessage: String?
-
+    /// The currently selected exercise type for filtering.
     @Published var selectedType: ExerciseType? = nil
-
+    /// Whether to sort duration ascending (true) or descending (false).
     @Published var isDurationAscending: Bool = true
 
     private var modelContext: ModelContext
@@ -20,6 +20,7 @@ class ExercisesViewModel: ObservableObject {
         fetchExercises()
     }
 
+    /// Returns exercises filtered by type and sorted by duration.
     var filteredAndSortedExercises: [Exercise] {
         let filtered = selectedType == nil
             ? exercises
