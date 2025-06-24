@@ -183,3 +183,58 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 > - Initializing models with sensible default values reduces boilerplate and errors.
 > - Combining filtering and sorting logic in the ViewModel keeps the UI code clean and maintainable.
 > - Accessibility and documentation are important for usability and future development.
+
+## Background and Motivation
+> The Activity Detection System is a core feature that enables MicroMove to gently nudge users to move when they've been inactive, making the app proactive and supportive. By leveraging ActivityLog and UserPreferences, the app can track user activity, respect their preferences (like quiet hours), and deliver smart, timely reminders. This helps users build sustainable movement habits without being intrusive.
+
+## Key Challenges and Analysis
+1. **iOS Background Execution**
+   - iOS restricts background tasks for battery and privacy reasons.
+   - Need to use allowed APIs (e.g., background fetch, notifications) and work within system limits.
+2. **User Privacy and Control**
+   - All activity tracking must be transparent and user-controlled.
+   - UserPreferences must allow opt-in/out, quiet hours, and custom reminder intervals.
+3. **Data Logging and Analysis**
+   - ActivityLog must accurately record relevant events (app opens, reminders, exercise completions, etc.).
+   - Data must be aggregated for streaks, reminders, and analytics.
+4. **Notification Scheduling**
+   - Reminders should only fire when appropriate (not during quiet hours, not too frequently).
+   - Must handle edge cases (e.g., user disables notifications, changes preferences).
+
+## High-Level Task Breakdown
+- [ ] Task 4.1: Define Activity Types and Logging Events
+  - ✅ Success Criteria: All relevant user and app events are clearly defined and logged to ActivityLog.
+  - 🎯 Learning Goal: Understand event modeling and logging in SwiftData.
+  - 📘 Educator Notes: Examples of event enums, best practices for logging, and a micro-exercise to log a custom event.
+
+- [ ] Task 4.2: Implement User Preferences for Reminders and Quiet Hours
+  - ✅ Success Criteria: User can set reminder interval, enable/disable reminders, and configure quiet hours in the UI.
+  - 🎯 Learning Goal: Learn about user settings, state persistence, and UI binding.
+  - 📘 Educator Notes: How to use @Published and SwiftData for settings, and a sample UI for preferences.
+
+- [ ] Task 4.3: Background Activity Monitoring and Trigger Logic
+  - ✅ Success Criteria: App detects inactivity (using ActivityLog) and schedules reminders according to user preferences.
+  - 🎯 Learning Goal: Explore background processing, notification scheduling, and logic for inactivity detection.
+  - 📘 Educator Notes: iOS background task patterns, UserNotifications, and a code snippet for scheduling a local notification.
+
+- [ ] Task 4.4: Notification Delivery and User Feedback
+  - ✅ Success Criteria: Reminders are delivered only when appropriate, and user actions are logged in ActivityLog.
+  - 🎯 Learning Goal: Understand notification delivery, user interaction logging, and feedback loops.
+  - 📘 Educator Notes: Handling notification permissions, logging user responses, and a micro-exercise to simulate a reminder event.
+
+## Project Status Board
+- [X] Task 1: Project Setup and Basic Architecture
+- [X] Task 2: Exercise Data Model and Storage
+- [X] Task 3: Exercise Library Implementation
+- [ ] Task 4: Activity Detection System
+- [ ] Task 5: Progress Tracking Implementation
+- [ ] Task 6: Achievement System
+- [ ] Task 7: UI Polish and Animations
+- [ ] Task 8: Testing and Optimization
+
+## Executor's Feedback or Assistance Requests
+> Task 4 planning started. Awaiting user confirmation to proceed with Task 4.1: Define Activity Types and Logging Events.
+
+## Lessons
+> - Planning for background activity and user preferences is essential for a respectful, effective reminder system.
+> - Clear event modeling in ActivityLog enables powerful analytics and smarter reminders.
