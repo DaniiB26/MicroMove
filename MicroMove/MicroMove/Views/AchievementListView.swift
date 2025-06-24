@@ -12,17 +12,28 @@ struct AchievementListView: View {
                 }
             }
             .navigationTitle("Achievements")
-        }
-
-        Button("Add Demo Achievement") {
-            let demoAchievement = Achievement(
-                title: "First Streak",
-                achievementDesc: "Complete a workout 3 days in a row.",
-                type: .streak,
-                requirement: 3,
-                isUnlocked: false
-            )
-            viewModel.addAchievement(demoAchievement)
+            // Toolbar for demo achievement button
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Add Demo Achievement") {
+                        // Avoid duplicate demo achievements
+                        if !viewModel.achievements.contains(where: { $0.title == "First Streak" }) {
+                            let demoAchievement = Achievement(
+                                title: "First Streak",
+                                achievementDesc: "Complete a workout 3 days in a row.",
+                                type: .streak,
+                                requirement: 3,
+                                isUnlocked: false
+                            )
+                            viewModel.addAchievement(demoAchievement)
+                        }
+                    }
+                }
+            }
+            // Fetch achievements when view appears
+            .onAppear {
+                viewModel.fetchAchievements()
+            }
         }
     }
 }
