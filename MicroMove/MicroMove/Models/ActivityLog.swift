@@ -17,11 +17,12 @@ final class ActivityLog {
 
     /// Types of activities that can be logged.
     enum ActivityType: String, Codable {
-        case screenUnlock
         case appOpen
         case exerciseStart
         case exerciseComplete
         case reminderTriggered
+        case reminderResponded
+        case inactivityDetected
     }
     
     /// Contexts for different times of day.

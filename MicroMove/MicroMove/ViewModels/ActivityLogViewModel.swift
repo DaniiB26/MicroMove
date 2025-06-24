@@ -53,4 +53,26 @@ class ActivityLogViewModel: ObservableObject {
             errorMessage = "Error deleting activity log: \(error.localizedDescription)"
         }
     }
+
+    private func getDayContext(for date: Date) -> ActivityLog.ActivityDayContext {
+        let hour = Calendar.current.component(.hour, from: date)
+        switch hour {
+        case 6..<12: return .morning
+        case 12..<18: return .afternoon
+        case 18..<22: return .evening
+        default: return .night
+        }
+    }
+
+    func addAppOpen() {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: Date(),
+            type: .appOpen,
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
 }
