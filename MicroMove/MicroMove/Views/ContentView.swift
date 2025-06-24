@@ -5,6 +5,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showAchievements = false
+    @State private static var hasLoggedAppOpen = false
 
     var body: some View {
         NavigationStack {
@@ -50,6 +51,13 @@ struct ContentView: View {
                     }
                     .accessibilityLabel("User Preferences")
                 }
+            }
+        }
+        .onAppear {
+            if !Self.hasLoggedAppOpen {
+                let activityLogViewModel = ActivityLogViewModel(modelContext: modelContext)
+                activityLogViewModel.addAppOpen()
+                Self.hasLoggedAppOpen = true
             }
         }
     }
