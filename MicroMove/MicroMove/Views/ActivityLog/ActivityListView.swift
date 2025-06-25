@@ -13,6 +13,9 @@ struct ActivityListView: View {
                 }
             }
             .navigationTitle("Activity Log")
+            .onAppear {
+                viewModel.fetchActivityLogs()
+            }
         }
     }
 }
