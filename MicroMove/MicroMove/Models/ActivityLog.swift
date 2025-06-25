@@ -10,6 +10,8 @@ final class ActivityLog {
     var timestamp: Date
     /// Type of activity performed.
     var type: ActivityType
+    /// Activity description.
+    var activityDesc: String
     /// Duration of the activity in minutes.
     var duration: Int
     /// Context of the day when the activity occurred.
@@ -38,12 +40,14 @@ final class ActivityLog {
         id: UUID = UUID(),
         timestamp: Date = Date(),
         type: ActivityType,
+        activityDesc: String,
         duration: Int,
         dayContext: ActivityDayContext
     ) {
         self.id = id
         self.timestamp = timestamp
         self.type = type
+        self.activityDesc = activityDesc
         self.duration = duration
         self.dayContext = dayContext
     }
