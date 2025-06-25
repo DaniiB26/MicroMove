@@ -4,6 +4,7 @@ import SwiftUI
 struct ExerciseDetailView: View {
     let exercise: Exercise
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
+    @State private var showTimer = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -19,8 +20,10 @@ struct ExerciseDetailView: View {
                     .frame(height: 200)
             }
             Spacer()
+            
             Button(action: {
                 activityLogViewModel.addExerciseStart(exercise: exercise)
+                showTimer = true
             }) {
                 Label("Start Exercise", systemImage: "play.circle")
                     .font(.headline)
@@ -30,9 +33,13 @@ struct ExerciseDetailView: View {
                     .cornerRadius(8)
             }
             .accessibilityLabel("Start Exercise")
+            
             Spacer()
         }
         .padding()
         .navigationTitle(exercise.name)
+        .navigationDestination(isPresented: $showTimer) {
+            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel)
+        }
     }
 }
