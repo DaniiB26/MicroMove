@@ -70,6 +70,72 @@ class ActivityLogViewModel: ObservableObject {
             id: UUID(),
             timestamp: Date(),
             type: .appOpen,
+            activityDesc: "App Open",
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
+
+    func addExerciseStart(exercise: Exercise) {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .exerciseStart,
+            activityDesc: "Exercise: \(exercise.name) started",
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
+
+    func addExerciseComplete(exercise: Exercise) {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .exerciseComplete,
+            activityDesc: "Exercise: \(exercise.name) completed",
+            duration: exercise.duration,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
+
+    func addReminderTriggered() {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .reminderTriggered,
+            activityDesc: "Reminder Triggered",
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
+
+    func addReminderResponded() {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .reminderResponded,
+            activityDesc: "Reminder Responded",
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+    }
+
+    func addInactivityDetected() {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .inactivityDetected,
+            activityDesc: "Inactivity Detected",
             duration: 0,
             dayContext: getDayContext(for: now)
         )
