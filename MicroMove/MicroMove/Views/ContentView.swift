@@ -5,6 +5,7 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var showAchievements = false
+    @State private var showActivityLog = false
     @State private static var hasLoggedAppOpen = false
 
     var body: some View {
@@ -17,6 +18,15 @@ struct ContentView: View {
                     viewModel: AchievementsViewModel(modelContext: modelContext)
                 ),
                 isActive: $showAchievements
+            ) {
+                EmptyView()
+            }
+
+            NavigationLink(
+                destination: ActivityListView(
+                    viewModel: ActivityLogViewModel(modelContext: modelContext)
+                ),
+                isActive: $showActivityLog
             ) {
                 EmptyView()
             }
@@ -36,7 +46,9 @@ struct ContentView: View {
                         Button("Achievements") {
                             showAchievements = true
                         }
-                        Button("Activity Log", action: {print("Activity Log Selected")}) 
+                        Button("Activity Log") {
+                            showActivityLog = true
+                        }
                     } label: {
                         Image(systemName: "line.3.horizontal")
                     }
