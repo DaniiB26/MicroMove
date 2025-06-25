@@ -21,6 +21,9 @@ struct ActivityDetailView: View {
             Divider()
             // Details section
             VStack(alignment: .leading, spacing: 12) {
+                Text(activityLog.activityDesc)
+                    .font(.body)
+                    .foregroundColor(.secondary)
                 Label {
                     Text(activityLog.timestamp.formatted(date: .abbreviated, time: .shortened))
                 } icon: {
