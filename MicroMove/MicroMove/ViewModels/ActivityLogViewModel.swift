@@ -30,12 +30,7 @@ class ActivityLogViewModel: ObservableObject {
     /// Adds a new activity log to the data store and updates the list.
     func addActivityLog(_ activityLog: ActivityLog) {
         modelContext.insert(activityLog)
-        do {
-            try modelContext.save()
-            activityLogs.append(activityLog)
-        } catch {
-            errorMessage = "Error saving new activity log: \(error.localizedDescription)"
-        }
+        activityLogs.append(activityLog)
     }
 
     /// Saves changes to an existing activity log. Call after modifying an activity log's properties.
@@ -57,10 +52,6 @@ class ActivityLogViewModel: ObservableObject {
         } catch {
             errorMessage = "Error deleting activity log: \(error.localizedDescription)"
         }
-    }
-
-    func getLastActivity() -> ActivityLog? {
-        return activityLogs.last
     }
 
     private func getDayContext(for date: Date) -> ActivityLog.ActivityDayContext {
