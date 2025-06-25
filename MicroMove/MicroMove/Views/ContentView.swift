@@ -11,7 +11,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             // Show the exercise list with filtering and sorting
-            ExerciseListView(viewModel: ExercisesViewModel(modelContext: modelContext))
+            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: ActivityLogViewModel(modelContext: modelContext))
 
             NavigationLink(
                 destination: AchievementListView(

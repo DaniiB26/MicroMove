@@ -3,6 +3,7 @@ import SwiftUI
 /// Displays detailed information about a single exercise.
 struct ExerciseDetailView: View {
     let exercise: Exercise
+    @ObservedObject var activityLogViewModel: ActivityLogViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -17,6 +18,18 @@ struct ExerciseDetailView: View {
                     .scaledToFit()
                     .frame(height: 200)
             }
+            Spacer()
+            Button(action: {
+                activityLogViewModel.addExerciseStart(exercise: exercise)
+            }) {
+                Label("Start Exercise", systemImage: "play.circle")
+                    .font(.headline)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.accentColor.opacity(0.1))
+                    .cornerRadius(8)
+            }
+            .accessibilityLabel("Start Exercise")
             Spacer()
         }
         .padding()
