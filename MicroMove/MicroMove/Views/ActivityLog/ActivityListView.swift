@@ -6,12 +6,13 @@ struct ActivityListView: View {
 
     var body: some View {
         NavigationStack {
+            // List of activity logs, sorted by newest first
             List(viewModel.activityLogs.sorted(by: { $0.timestamp > $1.timestamp }), id: \.id) { log in
                 NavigationLink(destination: ActivityDetailView(viewModel: viewModel, activityLog: log)) {
                     ActivityRowView(activityLog: log)
                 }
             }
+            .navigationTitle("Activity Log")
         }
-        .navigationTitle("Activity Log")
     }
 }
