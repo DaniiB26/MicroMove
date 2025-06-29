@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct MicroMoveApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Exercise.self,
@@ -22,7 +23,7 @@ struct MicroMoveApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(modelContext: sharedModelContainer.mainContext)
         }
         .modelContainer(sharedModelContainer)
     }

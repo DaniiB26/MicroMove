@@ -68,7 +68,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - Navigation patterns
     - View modifiers and styling
 
-- [ ] Task 4: Activity Detection System
+- [X] Task 4: Activity Detection System
   - ✅ Success Criteria
     - Background activity monitoring
     - Customizable reminder rules
@@ -144,12 +144,14 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [X] Task 1: Project Setup and Basic Architecture
 - [X] Task 2: Exercise Data Model and Storage
 - [X] Task 3: Exercise Library Implementation
-- [ ] Task 4: Activity Detection System
+- [X] Task 4: Activity Detection System
 - [ ] Task 5: Progress Tracking Implementation
 - [ ] Task 6: Achievement System
 - [ ] Task 7: UI Polish and Animations
 - [ ] Task 8: Testing and Optimization
 
+- [x] Fix Activity Log not updating in real time
+- [x] Implement timer functionality for exercises
 
 ## Executor's Feedback or Assistance Requests
 > Task 1 completed.
@@ -174,6 +176,37 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 > - Verified that exercises can be filtered and sorted, and details are shown correctly.
 > - Added accessibility improvements and documentation comments.
 > - No blockers encountered.
+
+> Fixed two issues:
+> 1. ActivityLogViewModel.addActivityLog now saves the modelContext after inserting a log, ensuring persistence.
+> 2. ActivityListView now calls viewModel.fetchActivityLogs() in .onAppear, so the list refreshes when the view appears (like AchievementListView).
+> 
+> This should make new activity logs appear immediately after being triggered, without needing to restart the app.
+
+> Implemented complete timer functionality:
+> 1. ExerciseDetailView now uses @State showTimer and navigationDestination to navigate to TimerView
+> 2. TimerView shows countdown timer with MM:SS format, exercise info, and cancel button
+> 3. When timer completes, it logs the exercise completion and navigates back automatically
+> 4. Timer properly cleans up on view disappear to prevent memory leaks
+> 5. Added proper initialization to convert exercise duration from minutes to seconds
+
+> Task 4 completed.
+> - Integrated ActivityMonitor into ContentView using @StateObject for ActivityLogViewModel and UserPreferencesViewModel.
+> - ActivityMonitor is initialized onAppear, requests notification permission, and checks/schedules reminders.
+> - Added a "Test Reminder" button in the toolbar menu to manually trigger ActivityMonitor's checkAndScheduleReminder for testing.
+> - All ViewModels are now shared across the app for consistent state.
+> - Manual test: Run the app, open the menu, and tap "Test Reminder". You should receive a local notification if outside quiet hours and the inactivity interval is met.
+> - If you do not receive a notification, check iOS notification permissions and quiet hour settings in preferences.
+> - No blockers encountered.
+
+> Task 4 completed.
+> - Implemented complete Activity Detection System with smart notification scheduling.
+> - ActivityMonitor handles quiet hours (including midnight spanning), inactivity detection, and user preferences.
+> - Notifications start from reminder time or immediately if past reminder time, then repeat every interval.
+> - After exercise activity, notification cycle resets from that activity point.
+> - Added AppDelegate for foreground notification display and proper permission handling.
+> - All core requirements met: background monitoring, customizable rules, time-based triggers.
+> - Ready to proceed to Task 5: Progress Tracking Implementation.
 
 ## Lessons
 > - Setting up a clear folder structure early helps keep the project organized and maintainable.
@@ -202,22 +235,22 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
    - Must handle edge cases (e.g., user disables notifications, changes preferences).
 
 ## High-Level Task Breakdown
-- [ ] Task 4.1: Define Activity Types and Logging Events
+- [X] Task 4.1: Define Activity Types and Logging Events
   - ✅ Success Criteria: All relevant user and app events are clearly defined and logged to ActivityLog.
   - 🎯 Learning Goal: Understand event modeling and logging in SwiftData.
   - 📘 Educator Notes: Examples of event enums, best practices for logging, and a micro-exercise to log a custom event.
 
-- [ ] Task 4.2: Implement User Preferences for Reminders and Quiet Hours
+- [X] Task 4.2: Implement User Preferences for Reminders and Quiet Hours
   - ✅ Success Criteria: User can set reminder interval, enable/disable reminders, and configure quiet hours in the UI.
   - 🎯 Learning Goal: Learn about user settings, state persistence, and UI binding.
   - 📘 Educator Notes: How to use @Published and SwiftData for settings, and a sample UI for preferences.
 
-- [ ] Task 4.3: Background Activity Monitoring and Trigger Logic
+- [X] Task 4.3: Background Activity Monitoring and Trigger Logic
   - ✅ Success Criteria: App detects inactivity (using ActivityLog) and schedules reminders according to user preferences.
   - 🎯 Learning Goal: Explore background processing, notification scheduling, and logic for inactivity detection.
   - 📘 Educator Notes: iOS background task patterns, UserNotifications, and a code snippet for scheduling a local notification.
 
-- [ ] Task 4.4: Notification Delivery and User Feedback
+- [X] Task 4.4: Notification Delivery and User Feedback
   - ✅ Success Criteria: Reminders are delivered only when appropriate, and user actions are logged in ActivityLog.
   - 🎯 Learning Goal: Understand notification delivery, user interaction logging, and feedback loops.
   - 📘 Educator Notes: Handling notification permissions, logging user responses, and a micro-exercise to simulate a reminder event.
@@ -226,14 +259,30 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [X] Task 1: Project Setup and Basic Architecture
 - [X] Task 2: Exercise Data Model and Storage
 - [X] Task 3: Exercise Library Implementation
-- [ ] Task 4: Activity Detection System
+- [X] Task 4: Activity Detection System
 - [ ] Task 5: Progress Tracking Implementation
 - [ ] Task 6: Achievement System
 - [ ] Task 7: UI Polish and Animations
 - [ ] Task 8: Testing and Optimization
 
 ## Executor's Feedback or Assistance Requests
-> Task 4 planning started. Awaiting user confirmation to proceed with Task 4.1: Define Activity Types and Logging Events.
+> Task 4 completed.
+> - Integrated ActivityMonitor into ContentView using @StateObject for ActivityLogViewModel and UserPreferencesViewModel.
+> - ActivityMonitor is initialized onAppear, requests notification permission, and checks/schedules reminders.
+> - Added a "Test Reminder" button in the toolbar menu to manually trigger ActivityMonitor's checkAndScheduleReminder for testing.
+> - All ViewModels are now shared across the app for consistent state.
+> - Manual test: Run the app, open the menu, and tap "Test Reminder". You should receive a local notification if outside quiet hours and the inactivity interval is met.
+> - If you do not receive a notification, check iOS notification permissions and quiet hour settings in preferences.
+> - No blockers encountered.
+
+> Task 4 completed.
+> - Implemented complete Activity Detection System with smart notification scheduling.
+> - ActivityMonitor handles quiet hours (including midnight spanning), inactivity detection, and user preferences.
+> - Notifications start from reminder time or immediately if past reminder time, then repeat every interval.
+> - After exercise activity, notification cycle resets from that activity point.
+> - Added AppDelegate for foreground notification display and proper permission handling.
+> - All core requirements met: background monitoring, customizable rules, time-based triggers.
+> - Ready to proceed to Task 5: Progress Tracking Implementation.
 
 ## Lessons
 > - Planning for background activity and user preferences is essential for a respectful, effective reminder system.

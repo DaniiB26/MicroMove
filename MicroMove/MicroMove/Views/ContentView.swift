@@ -3,15 +3,24 @@ import SwiftData
 
 /// The main entry point for the app, displaying the exercise library.
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
+    private let modelContext: ModelContext
     @State private var showAchievements = false
     @State private var showActivityLog = false
     @State private static var hasLoggedAppOpen = false
+    @StateObject private var activityLogViewModel: ActivityLogViewModel
+    @StateObject private var userPreferencesViewModel: UserPreferencesViewModel
+    @State private var activityMonitor: ActivityMonitor? = nil
+
+    init(modelContext: ModelContext) {
+        self.modelContext = modelContext
+        _activityLogViewModel = StateObject(wrappedValue: ActivityLogViewModel(modelContext: modelContext))
+        _userPreferencesViewModel = StateObject(wrappedValue: UserPreferencesViewModel(modelContext: modelContext))
+    }
 
     var body: some View {
         NavigationStack {
             // Show the exercise list with filtering and sorting
-            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: ActivityLogViewModel(modelContext: modelContext))
+            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: activityLogViewModel)
 
             NavigationLink(
                 destination: AchievementListView(
@@ -49,6 +58,9 @@ struct ContentView: View {
                         Button("Activity Log") {
                             showActivityLog = true
                         }
+                        Button("Test Reminder") {
+                            activityMonitor?.checkAndScheduleReminder()
+                        }
                     } label: {
                         Image(systemName: "line.3.horizontal")
                     }
@@ -56,7 +68,7 @@ struct ContentView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(
                         destination: UserPreferencesView(
-                            viewModel: UserPreferencesViewModel(modelContext: modelContext)
+                            viewModel: userPreferencesViewModel
                         )
                     ) {
                         Image(systemName: "gearshape")
@@ -66,16 +78,20 @@ struct ContentView: View {
             }
         }
         .onAppear {
+            if activityMonitor == nil {
+                activityMonitor = ActivityMonitor(activityLogViewModel: activityLogViewModel, userPreferencesViewModel: userPreferencesViewModel)
+                activityMonitor?.requestNotificationPermission()
+            }
             if !Self.hasLoggedAppOpen {
-                let activityLogViewModel = ActivityLogViewModel(modelContext: modelContext)
                 activityLogViewModel.addAppOpen()
                 Self.hasLoggedAppOpen = true
             }
+            activityMonitor?.checkAndScheduleReminder()
         }
     }
 }
 
 #Preview {
-    ContentView()
-        .modelContainer(for: Exercise.self, inMemory: true)
+    let container = try! ModelContainer(for: Exercise.self, Achievement.self, ActivityLog.self, Progress.self, UserPreferences.self, WorkoutSession.self)
+    ContentView(modelContext: container.mainContext)
 }
