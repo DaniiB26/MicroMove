@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UserNotifications
 
 /// ViewModel for managing ActivityLog CRUD operations and state.
 @MainActor
@@ -129,13 +130,13 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
-    func addInactivityDetected() {
+    func addInactivityDetected(inactiveTime: TimeInterval) {
         let now = Date()
         let log = ActivityLog(
             id: UUID(),
             timestamp: now,
             type: .inactivityDetected,
-            activityDesc: "Inactivity Detected",
+            activityDesc: "User was inactive for \(inactiveTime) seconds",
             duration: 0,
             dayContext: getDayContext(for: now)
         )

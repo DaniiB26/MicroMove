@@ -20,7 +20,7 @@ class ActivityMonitor {
 
     func getLastActivity() -> ActivityLog? {
         let allLogs = activityLogViewModel.activityLogs
-        let relevantTypes: [ActivityLog.ActivityType] = [.appOpen, .exerciseStart, .exerciseComplete]
+        let relevantTypes: [ActivityLog.ActivityType] = [.exerciseStart, .exerciseComplete]
         return allLogs
             .filter { relevantTypes.contains($0.type) }
             .sorted { $0.timestamp > $1.timestamp }
@@ -52,7 +52,7 @@ class ActivityMonitor {
         // Handle quiet hours that may span midnight
         if quietStartInMinutes < quietEndInMinutes {
             // Quiet hours do NOT span midnight
-            return currentTimeInMinutes >= quietStartInMinutes && currentTimeInMinutes <= quietEndInMinutes
+        return currentTimeInMinutes >= quietStartInMinutes && currentTimeInMinutes <= quietEndInMinutes
         } else {
             // Quiet hours DO span midnight
             return currentTimeInMinutes >= quietStartInMinutes || currentTimeInMinutes <= quietEndInMinutes
@@ -158,6 +158,15 @@ class ActivityMonitor {
             } else {
                 print("Repeating notification scheduled successfully.")
             }
+        }
+    }
+
+    func detectAndLogInactivity() {
+        let inactiveTime = timeSinceLastActivity()
+        let reminderInterval = TimeInterval(userPreferencesViewModel.reminderInterval * 60)
+
+        if inactiveTime >= reminderInterval * 2 {
+            activityLogViewModel.addInactivityDetected(inactiveTime)
         }
     }
 }
