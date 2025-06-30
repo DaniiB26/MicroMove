@@ -3,6 +3,7 @@ import SwiftUI
 struct SimpleCalendarView: View {
     let daysInMonth: [Date]
     let activeDays: Set<Date>
+    let onDaySelected: (Date) -> Void
 
     var body: some View {
         // Weekday headers
@@ -25,6 +26,9 @@ struct SimpleCalendarView: View {
                         .overlay(Text("\(Calendar.current.component(.day, from: day))")
                             .font(.caption)
                             .foregroundColor(.primary))
+                        .onTapGesture {
+                            onDaySelected(day)
+                        }
                         .accessibilityLabel("Day \(Calendar.current.component(.day, from: day)) \(activeDays.contains(day) ? ", active" : ", inactive")")
                 }
             }

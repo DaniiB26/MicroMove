@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProgressView: View {
     @ObservedObject var viewModel: ProgressViewModel
+    @State private var selectedDay: Date? = nil
 
     // Returns all days in the current month for the calendar
     private var daysInMonth: [Date] {
@@ -18,11 +19,7 @@ struct ProgressView: View {
 
     // Returns a set of days with at least one workout session
     private var activeDays: Set<Date> {
-        guard let progress = viewModel.progress.first else { return [] }
-        let calendar = Calendar.current
-        return Set(progress.workoutSessions.map { session in
-            calendar.startOfDay(for: session.date)
-        })
+        viewModel.activeDays
     }
 
     // Returns a formatted label for the current month
@@ -36,35 +33,44 @@ struct ProgressView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             // Progress summary section
-            if let progress = viewModel.progress.first {
-                Text("Exercises Completed: \(progress.exercisesCompleted)")
-                Text("Total Minutes: \(progress.totalMinutes)")
-                Text("Current Streak: \(progress.currentStreak)")
-                Text("Longest Streak: \(progress.longestStreak)")
-                // Show achievements if available
-                if !progress.achievements.isEmpty {
-                    Text("Achievements:")
-                        .font(.headline)
-                    ForEach(progress.achievements, id: \.id) { achievement in
-                        HStack {
-                            Text(achievement.title)
-                            if achievement.isUnlocked {
-                                Image(systemName: "checkmark.seal.fill").foregroundColor(.green)
-                            }
-                        }
-                        .font(.subheadline)
-                    }
-                }
-            } else {
-                Text("No progress data available")
-            }
+            // List(viewModel.dailyProgress.sorted(by: { $0.key > $1.key }), id: \.key) { day, stats in
+            //     HStack {
+            //         Text(day, style: .date)
+            //         Spacer()
+            //         Text("\(stats.exercises) exercises")
+            //         Text("\(stats.duration) min")
+            //     }
+            // }
+
+            Text("Current Streak: \(viewModel.currentStreak) day/s")
+            Text("Longest Streak: \(viewModel.longestStreak) day/s")
 
             // Month label and calendar
             Text(monthLabel)
                 .font(.headline)
                 .padding(.top)
-            SimpleCalendarView(daysInMonth: daysInMonth, activeDays: activeDays)
+            SimpleCalendarView(daysInMonth: daysInMonth, activeDays: activeDays, onDaySelected: {day in selectedDay = day })
+
+            if let selectedDay = selectedDay,
+               let session = viewModel.workoutSessions.first(where: { Calendar.current.isDate($0.date, inSameDayAs: selectedDay) }) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Workout Details for \(selectedDay, style: .date)")
+                        .font(.headline)
+                    Text("Exercises: \(session.exercises.map { $0.name }.joined(separator: ", "))")
+                    Text("Duration: \(session.duration) min")
+                    if let startedAt = session.startedAt {
+                        Text("Started: \(startedAt, style: .time)")
+                    }
+                    if let completedAt = session.completedAt {
+                        Text("Completed: \(completedAt, style: .time)")
+                    } 
+                }
+                .padding()
+            }
         }
         .padding()
+        .onAppear {
+            viewModel.refreshProgress()
+        }
     }
 }
