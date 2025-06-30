@@ -166,7 +166,7 @@ class ActivityMonitor {
         let reminderInterval = TimeInterval(userPreferencesViewModel.reminderInterval * 60)
 
         if inactiveTime >= reminderInterval * 2 {
-            activityLogViewModel.addInactivityDetected(inactiveTime)
+            activityLogViewModel.addInactivityDetected(inactiveTime: inactiveTime)
         }
     }
 }
