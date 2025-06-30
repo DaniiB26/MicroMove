@@ -4,53 +4,81 @@ import SwiftData
 /// ViewModel for managing Progress CRUD operations and state.
 @MainActor
 class ProgressViewModel: ObservableObject {
-    /// The list of all progress records, published for UI updates.
-    @Published var progress: [Progress] = []
+    /// The list of all workout sessions, published for UI updates.
+    @Published var workoutSessions: [WorkoutSession] = []
     /// Error message for UI display, if any operation fails.
     @Published var errorMessage: String?
+
+    @Published var dailyProgress: [Date: (exercises: Int, duration: Int)] = [:]
+    @Published var currentStreak: Int = 0
+    @Published var longestStreak: Int = 0
+    @Published var activeDays: Set<Date> = []
 
     private var modelContext: ModelContext
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
-        fetchProgress()
+        refreshProgress()
     }
 
-    /// Fetches all progress records from the data store.
-    func fetchProgress() {
+    /// Fetches all workout sessions from the data store.
+    func fetchWorkoutSessions() {
         do {
-            let descriptor = FetchDescriptor<Progress>()
-            progress = try modelContext.fetch(descriptor)
+            let descriptor = FetchDescriptor<WorkoutSession>()
+            workoutSessions = try modelContext.fetch(descriptor)
         } catch {
-            errorMessage = "Error fetching progress: \(error.localizedDescription)"
-            progress = []
+            errorMessage = "Error fetching workout sessions: \(error.localizedDescription)"
+            workoutSessions = []
         }
     }
 
-    /// Adds a new progress record to the data store and updates the list.
-    func addProgress(_ progressRecord: Progress) {
-        modelContext.insert(progressRecord)
-        progress.append(progressRecord)
+    /// Refreshes all progress data (sessions, daily progress, streaks, active days)
+    func refreshProgress() {
+        fetchWorkoutSessions()
+        calculateDailyProgress()
+        calculateStreaks()
+        calculateActiveDays()
     }
 
-    /// Saves changes to an existing progress record. Call after modifying a progress's properties.
-    func updateProgress(_ progressRecord: Progress) {
-        do {
-            try modelContext.save()
-            // Optionally update the item in the array if needed
-        } catch {
-            errorMessage = "Error updating progress: \(error.localizedDescription)"
+    /// Aggregates daily progress from workout sessions
+    func calculateDailyProgress() {
+        let calendar = Calendar.current
+        var progressByDay: [Date: (exercises: Int, duration: Int)] = [:]
+        for session in workoutSessions {
+            let day = calendar.startOfDay(for: session.date)
+            progressByDay[day] = (session.exercises.count, session.duration)
         }
+        dailyProgress = progressByDay
     }
 
-    /// Deletes a progress record from the data store and updates the list.
-    func deleteProgress(_ progressRecord: Progress) {
-        do {
-            modelContext.delete(progressRecord)
-            try modelContext.save()
-            progress.removeAll { $0.id == progressRecord.id }
-        } catch {
-            errorMessage = "Error deleting progress: \(error.localizedDescription)"
+    /// Calculates current and longest streaks from daily progress
+    func calculateStreaks() {
+        let calendar = Calendar.current
+        let sortedDays = dailyProgress.keys.sorted()
+        var streak = 0
+        var maxStreak = 0
+        var lastDay: Date?
+        for day in sortedDays {
+            if let last = lastDay {
+                let daysBetween = calendar.dateComponents([.day], from: last, to: day).day ?? 0
+                if daysBetween == 1 {
+                    streak += 1
+                } else if daysBetween > 1 {
+                    streak = 1
+                }
+            } else {
+                streak = 1
+            }
+            maxStreak = max(maxStreak, streak)
+            lastDay = day
         }
+        currentStreak = streak
+        longestStreak = maxStreak
+    }
+
+    /// Calculates the set of days with at least one workout session (for calendar views)
+    func calculateActiveDays() {
+        let calendar = Calendar.current
+        activeDays = Set(workoutSessions.map { calendar.startOfDay(for: $0.date) })
     }
 }
