@@ -19,12 +19,8 @@ class ActivityMonitor {
     }
 
     func getLastActivity() -> ActivityLog? {
-        let allLogs = activityLogViewModel.activityLogs
-        let relevantTypes: [ActivityLog.ActivityType] = [.exerciseStart, .exerciseComplete]
-        return allLogs
-            .filter { relevantTypes.contains($0.type) }
-            .sorted { $0.timestamp > $1.timestamp }
-            .first
+        // Use the new method from ActivityLogViewModel for clarity
+        return activityLogViewModel.lastExerciseActivityLog()
     }
 
     func shouldScheduleReminder() -> Bool {
@@ -164,7 +160,7 @@ class ActivityMonitor {
     func detectAndLogInactivity() {
         let inactiveTime = timeSinceLastActivity()
         let reminderInterval = TimeInterval(userPreferencesViewModel.reminderInterval * 60)
-
+        // Log inactivity if user has missed 2 reminder intervals
         if inactiveTime >= reminderInterval * 2 {
             activityLogViewModel.addInactivityDetected(inactiveTime: inactiveTime)
         }

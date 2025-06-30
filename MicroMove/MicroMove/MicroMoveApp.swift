@@ -25,6 +25,7 @@ struct MicroMoveApp: App {
         WindowGroup {
             ContentView(modelContext: sharedModelContainer.mainContext)
                 .onAppear{
+                    // Share ActivityLogViewModel with AppDelegate for notification response logging
                     let activityLogViewModel = ActivityLogViewModel(modelContext: sharedModelContainer.mainContext)
                     appDelegate.activityLogViewModel = activityLogViewModel
                 }

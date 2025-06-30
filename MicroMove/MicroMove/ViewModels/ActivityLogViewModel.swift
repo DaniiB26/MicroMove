@@ -142,4 +142,13 @@ class ActivityLogViewModel: ObservableObject {
         )
         addActivityLog(log)
     }
+
+    /// Returns the most recent exercise activity log (start or complete)
+    func lastExerciseActivityLog() -> ActivityLog? {
+        let relevantTypes: [ActivityLog.ActivityType] = [.exerciseStart, .exerciseComplete]
+        return activityLogs
+            .filter { relevantTypes.contains($0.type) }
+            .sorted { $0.timestamp > $1.timestamp }
+            .first
+    }
 }

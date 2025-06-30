@@ -19,6 +19,7 @@ final class ActivityLog {
 
     /// Types of activities that can be logged.
     enum ActivityType: String, Codable {
+        /// Only .exerciseStart and .exerciseComplete are considered for inactivity detection.
         case appOpen
         case exerciseStart
         case exerciseComplete

@@ -30,7 +30,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        activityLogViewModel?.addReminderResponded()
+        // No longer log reminder responded here; only log when user taps notification
         print("App became active")
     }
 }
