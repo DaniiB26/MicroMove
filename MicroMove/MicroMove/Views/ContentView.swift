@@ -9,18 +9,20 @@ struct ContentView: View {
     @State private static var hasLoggedAppOpen = false
     @StateObject private var activityLogViewModel: ActivityLogViewModel
     @StateObject private var userPreferencesViewModel: UserPreferencesViewModel
+    @StateObject private var workoutSessionViewModel: WorkoutSessionViewModel
     @State private var activityMonitor: ActivityMonitor? = nil
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
         _activityLogViewModel = StateObject(wrappedValue: ActivityLogViewModel(modelContext: modelContext))
         _userPreferencesViewModel = StateObject(wrappedValue: UserPreferencesViewModel(modelContext: modelContext))
+        _workoutSessionViewModel = StateObject(wrappedValue: WorkoutSessionViewModel(modelContext: modelContext))
     }
 
     var body: some View {
         NavigationStack {
             // Show the exercise list with filtering and sorting
-            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: activityLogViewModel)
+            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel)
 
             NavigationLink(
                 destination: AchievementListView(

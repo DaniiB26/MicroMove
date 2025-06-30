@@ -3,14 +3,16 @@ import SwiftUI
 struct TimerView: View {
     @State private var isRunning = true
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
+    @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @State private var timer: Timer?
     @Environment(\.dismiss) private var dismiss
     @State private var timeRemaining: Int
     let exercise: Exercise
 
-    init(exercise: Exercise, activityLogViewModel: ActivityLogViewModel) {
+    init(exercise: Exercise, activityLogViewModel: ActivityLogViewModel, workoutSessionViewModel: WorkoutSessionViewModel) {
         self.exercise = exercise
         self.activityLogViewModel = activityLogViewModel
+        self.workoutSessionViewModel = workoutSessionViewModel
         self._timeRemaining = State(initialValue: exercise.duration * 60) // Convert minutes to seconds
     }
 
@@ -35,6 +37,7 @@ struct TimerView: View {
     func completeExercise() {
         // Log the completed exercise
         activityLogViewModel.addExerciseComplete(exercise: exercise)
+        workoutSessionViewModel.addExerciseToSession(exercise: exercise)
         // Navigate back to exercise detail view
         dismiss()
     }

@@ -4,6 +4,7 @@ import SwiftUI
 struct ExerciseDetailView: View {
     let exercise: Exercise
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
+    @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @State private var showTimer = false
 
     var body: some View {
@@ -39,7 +40,7 @@ struct ExerciseDetailView: View {
         .padding()
         .navigationTitle(exercise.name)
         .navigationDestination(isPresented: $showTimer) {
-            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel)
+            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel)
         }
     }
 }

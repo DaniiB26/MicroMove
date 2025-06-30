@@ -13,9 +13,9 @@ final class WorkoutSession {
     /// List of exercises performed in this session.
     var exercises: [Exercise]
     /// Timestamp when the session started.
-    var startedAt: Date
+    var startedAt: Date?
     /// Timestamp when the session was completed.
-    var completedAt: Date
+    var completedAt: Date?
 
     /// Initializes a new WorkoutSession.
     init(
@@ -23,8 +23,8 @@ final class WorkoutSession {
         date: Date = Date(),
         duration: Int = 0,
         exercises: [Exercise] = [],
-        startedAt: Date = Date(),
-        completedAt: Date = Date()
+        startedAt: Date? = nil,
+        completedAt: Date? = nil
     ) {
         self.id = id
         self.date = date
