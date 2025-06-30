@@ -24,6 +24,10 @@ struct MicroMoveApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(modelContext: sharedModelContainer.mainContext)
+                .onAppear{
+                    let activityLogViewModel = ActivityLogViewModel(modelContext: sharedModelContainer.mainContext)
+                    appDelegate.activityLogViewModel = activityLogViewModel
+                }
         }
         .modelContainer(sharedModelContainer)
     }
