@@ -81,4 +81,30 @@ class ProgressViewModel: ObservableObject {
         let calendar = Calendar.current
         activeDays = Set(workoutSessions.map { calendar.startOfDay(for: $0.date) })
     }
+
+    /// Returns all workout sessions for a given day
+    func sessions(for day: Date) -> [WorkoutSession] {
+        let calendar = Calendar.current
+        return workoutSessions.filter { calendar.isDate($0.date, inSameDayAs: day) }
+    }
+
+    /// Returns total exercises and duration for the current week
+    func weeklyStats() -> (exercises: Int, duration: Int) {
+        let calendar = Calendar.current
+        guard let weekInterval = calendar.dateInterval(of: .weekOfYear, for: Date()) else { return (0, 0) }
+        let weekSessions = workoutSessions.filter { weekInterval.contains($0.date) }
+        let totalExercises = weekSessions.reduce(0) { $0 + $1.exercises.count }
+        let totalDuration = weekSessions.reduce(0) { $0 + $1.duration }
+        return (totalExercises, totalDuration)
+    }
+
+    /// Returns total exercises and duration for the current month
+    func monthlyStats() -> (exercises: Int, duration: Int) {
+        let calendar = Calendar.current
+        guard let monthInterval = calendar.dateInterval(of: .month, for: Date()) else { return (0, 0) }
+        let monthSessions = workoutSessions.filter { monthInterval.contains($0.date) }
+        let totalExercises = monthSessions.reduce(0) { $0 + $1.exercises.count }
+        let totalDuration = monthSessions.reduce(0) { $0 + $1.duration }
+        return (totalExercises, totalDuration)
+    }
 }
