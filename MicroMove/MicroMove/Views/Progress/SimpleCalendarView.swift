@@ -9,14 +9,6 @@ struct SimpleCalendarView: View {
         // Weekday headers
         let weekdaySymbols = Calendar.current.shortWeekdaySymbols
         VStack(spacing: 4) {
-            HStack {
-                ForEach(weekdaySymbols, id: \.self) { symbol in
-                    Text(symbol)
-                        .font(.caption2)
-                        .frame(maxWidth: .infinity)
-                        .accessibilityLabel(symbol)
-                }
-            }
             // Calendar grid
             LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7)) {
                 ForEach(daysInMonth, id: \.self) { day in

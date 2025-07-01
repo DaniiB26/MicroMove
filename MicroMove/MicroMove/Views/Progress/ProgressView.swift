@@ -3,18 +3,22 @@ import SwiftUI
 struct ProgressView: View {
     @ObservedObject var viewModel: ProgressViewModel
     @State private var selectedDay: Date? = nil
+    @State private var displayedMonth: Date = Date()
 
-    // Returns all days in the current month for the calendar
-    private var daysInMonth: [Date] {
+    private var daysInDisplayedMonth: [Date] {
         let calendar = Calendar.current
-        let today = Date()
-        guard let range = calendar.range(of: .day, in: .month, for: today),
-                let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: today)) else {
+        guard let range = calendar.range(of: .day, in: .month, for: displayedMonth),
+                let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth)) else {
             return []
         }
         return range.compactMap { day -> Date? in
             calendar.date(byAdding: .day, value: day - 1, to: monthStart)
         }
+    }
+
+    private var activeDaysInDisplayedMonth: Set<Date> {
+        let calendar = Calendar.current
+        return activeDays.filter { calendar.isDate($0, equalTo: displayedMonth, toGranularity: .month) }
     }
 
     // Returns a set of days with at least one workout session
@@ -23,11 +27,10 @@ struct ProgressView: View {
     }
 
     // Returns a formatted label for the current month
-    private var monthLabel: String {
-        let today = Date()
+    private func monthLabel(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "LLLL yyyy"
-        return formatter.string(from: today)
+        return formatter.string(from: date)
     }
 
     var body: some View {
@@ -98,16 +101,34 @@ struct ProgressView: View {
                 Divider()
 
                 // Month label and calendar
-                Text(monthLabel)
-                    .font(.headline)
-                    .padding(.horizontal)
-                SimpleCalendarView(
-                    daysInMonth: daysInMonth,
-                    activeDays: activeDays,
-                    onDaySelected: { day in
-                        withAnimation(.spring()) {
-                            selectedDay = day
+
+                HStack {
+                    Button(action: {
+                        if let prevMonth = Calendar.current.date(byAdding: .month, value: -1, to: displayedMonth) {
+                            displayedMonth = prevMonth
                         }
+                    }) {
+                        Image(systemName: "chevron.left")
+                    }
+                    Spacer()
+                    Text(monthLabel(for: displayedMonth))
+                        .font(.headline)
+                    Spacer()
+                    Button(action: {
+                        if let nextMonth = Calendar.current.date(byAdding: .month, value: 1, to: displayedMonth) {
+                            displayedMonth = nextMonth
+                        }
+                    }) {
+                        Image(systemName: "chevron.right")
+                    }
+                }
+                .padding(.horizontal)
+
+                SimpleCalendarView(
+                    daysInMonth: daysInDisplayedMonth,
+                    activeDays: activeDaysInDisplayedMonth,
+                    onDaySelected: { day in
+                        selectedDay = day
                     }
                 )
                 .padding(.horizontal)
