@@ -69,7 +69,7 @@ class ActivityMonitor {
     func checkAndScheduleReminder() {
         print("checkAndScheduleReminder called")
         // Remove any existing scheduled reminders to avoid duplicates
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["movement-reminder-repeating", "movement-reminder-initial"])
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["movement-reminder-repeating", "movement-reminder-repeating-repeat"])
 
         let inQuietHours = isInQuietHours()
         print("isInQuietHours: \(inQuietHours)")
@@ -78,73 +78,55 @@ class ActivityMonitor {
             return
         }
 
+        // Prepare notification content
         let content = UNMutableNotificationContent()
         content.title = "Time to Move!"
         content.body = "Take a quick break and do a micro-workout."
         content.sound = .default
 
-        let calendar = Calendar.current
-        let now = Date()
+        // Calculate the interval in seconds from user preferences (minutes to seconds)
         let interval = TimeInterval(userPreferencesViewModel.reminderInterval * 60)
 
-        // Find the most recent activity log from today
-        let todayStart = calendar.startOfDay(for: now)
-        let todayLogs = activityLogViewModel.activityLogs
-            .filter { $0.timestamp >= todayStart }
-            .sorted { $0.timestamp > $1.timestamp }
+        // Get the last activity timestamp (optional)
+        let timeAtLastActivity = activityLogViewModel.lastExerciseActivityLog()?.timestamp
+        let userReminderTime = userPreferencesViewModel.reminderTime
 
-        var firstFireDate: Date
-
-        if let lastTodayLog = todayLogs.first {
-            // There was activity today: schedule from last log + interval
-            firstFireDate = lastTodayLog.timestamp.addingTimeInterval(interval)
-            print("Scheduling from last activity log at \(lastTodayLog.timestamp)")
-            // If the calculated fire date is in the past, schedule for now + interval
-            if firstFireDate < now {
-                firstFireDate = now.addingTimeInterval(interval)
-            }
+        // Determine the anchor time: the most recent of last activity or reminder time
+        var anchorTime: Date
+        if let lastActivity = timeAtLastActivity, lastActivity > userReminderTime {
+            anchorTime = lastActivity
+            print("Anchor time is last activity: \(anchorTime)")
         } else {
-            // No activity today: start from reminderTime or now if past reminder time
-            let reminderTime = userPreferencesViewModel.reminderTime
-            var nextReminder = calendar.date(
-                bySettingHour: calendar.component(.hour, from: reminderTime),
-                minute: calendar.component(.minute, from: reminderTime),
-                second: 0,
-                of: now
-            ) ?? now
-            
-            if nextReminder < now {
-                // If reminder time has passed today, start immediately (in next interval)
-                firstFireDate = now.addingTimeInterval(interval)
-                print("Reminder time passed, starting in \(interval/60) minutes")
-            } else {
-                // Reminder time hasn't passed yet today
-                firstFireDate = nextReminder
-                print("Scheduling from reminder time at \(firstFireDate)")
-            }
+            anchorTime = userReminderTime
+            print("Anchor time is user reminder time: \(anchorTime)")
         }
 
-        let timeIntervalUntilFirst = firstFireDate.timeIntervalSince(now)
+        // Calculate the next reminder time: interval minutes after anchor time, but in the future
+        var nextReminderTime = anchorTime.addingTimeInterval(interval)
+        while nextReminderTime < Date() {
+            nextReminderTime = nextReminderTime.addingTimeInterval(interval)
+        }
+        let timeUntilNext = max(nextReminderTime.timeIntervalSinceNow, 1)
+        print("Next reminder will fire in \(timeUntilNext) seconds (", nextReminderTime, ") and repeat every \(interval) seconds.")
 
-        // Schedule the first notification
-        let firstTrigger = UNTimeIntervalNotificationTrigger(timeInterval: timeIntervalUntilFirst, repeats: false)
-        let firstRequest = UNNotificationRequest(
-            identifier: "movement-reminder-initial",
+        // Schedule the first notification (non-repeating)
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: timeUntilNext, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "movement-reminder-repeating",
             content: content,
-            trigger: firstTrigger
+            trigger: trigger
         )
-        UNUserNotificationCenter.current().add(firstRequest) { error in
+        UNUserNotificationCenter.current().add(request) { error in
             if let error = error {
-                print("Failed to schedule initial notification: \(error)")
+                print("Failed to schedule notification: \(error)")
             } else {
-                print("Initial notification scheduled successfully.")
+                print("Notification scheduled for \(nextReminderTime)")
             }
         }
-
-        // Schedule repeating notifications every reminderInterval minutes
+        // Schedule repeating notifications every interval after the first one
         let repeatingTrigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: true)
         let repeatingRequest = UNNotificationRequest(
-            identifier: "movement-reminder-repeating",
+            identifier: "movement-reminder-repeating-repeat",
             content: content,
             trigger: repeatingTrigger
         )
@@ -152,7 +134,7 @@ class ActivityMonitor {
             if let error = error {
                 print("Failed to schedule repeating notification: \(error)")
             } else {
-                print("Repeating notification scheduled successfully.")
+                print("Repeating notification scheduled every \(interval) seconds.")
             }
         }
     }
@@ -163,6 +145,45 @@ class ActivityMonitor {
         // Log inactivity if user has missed 2 reminder intervals
         if inactiveTime >= reminderInterval * 2 {
             activityLogViewModel.addInactivityDetected(inactiveTime: inactiveTime)
+        }
+    }
+
+    func transformFromDateToSeconds(date: Date) -> TimeInterval {
+        let calendar = Calendar.current
+
+        let hour = calendar.component(.hour, from: date)
+        let minutes = calendar.component(.minute, from: date)
+        return TimeInterval(hour * 3600 + minutes * 60)
+    }
+
+    /// Cancels all pending reminder notifications and schedules a new repeating notification interval minutes from now.
+    func resetReminderFromNow() {
+        print("resetReminderFromNow called")
+        // Remove all pending reminder notifications (both identifiers)
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: ["movement-reminder-repeating", "movement-reminder-repeating-repeat"])
+
+        // Prepare notification content
+        let content = UNMutableNotificationContent()
+        content.title = "Time to Move!"
+        content.body = "Take a quick break and do a micro-workout."
+        content.sound = .default
+
+        // Calculate the interval in seconds from user preferences (minutes to seconds)
+        let interval = TimeInterval(userPreferencesViewModel.reminderInterval * 60)
+
+        // Schedule a new repeating notification interval minutes from now
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval, repeats: true)
+        let request = UNNotificationRequest(
+            identifier: "movement-reminder-repeating",
+            content: content,
+            trigger: trigger
+        )
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error = error {
+                print("Failed to schedule repeating notification from now: \(error)")
+            } else {
+                print("Repeating notification scheduled from now (interval: \(interval) seconds).")
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ struct ExerciseDetailView: View {
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @State private var showTimer = false
+    var activityMonitor: ActivityMonitor? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -40,7 +41,7 @@ struct ExerciseDetailView: View {
         .padding()
         .navigationTitle(exercise.name)
         .navigationDestination(isPresented: $showTimer) {
-            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel)
+            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor)
         }
     }
 }

@@ -6,6 +6,7 @@ struct ExerciseListView: View {
     @ObservedObject var exerciseViewModel: ExercisesViewModel
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
+    var activityMonitor: ActivityMonitor? = nil
 
     var body: some View {
         NavigationStack {
@@ -43,7 +44,7 @@ struct ExerciseListView: View {
                 .padding(.horizontal)
                 
                 List(exerciseViewModel.filteredAndSortedExercises, id: \.id) { exercise in
-                    NavigationLink(destination: ExerciseDetailView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel)) {
+                    NavigationLink(destination: ExerciseDetailView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor)) {
                         ExerciseRowView(exercise: exercise)
                     }
                 }

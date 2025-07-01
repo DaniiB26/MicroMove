@@ -8,11 +8,13 @@ struct TimerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var timeRemaining: Int
     let exercise: Exercise
+    var activityMonitor: ActivityMonitor? // Optional ActivityMonitor for notification reset
 
-    init(exercise: Exercise, activityLogViewModel: ActivityLogViewModel, workoutSessionViewModel: WorkoutSessionViewModel) {
+    init(exercise: Exercise, activityLogViewModel: ActivityLogViewModel, workoutSessionViewModel: WorkoutSessionViewModel, activityMonitor: ActivityMonitor? = nil) {
         self.exercise = exercise
         self.activityLogViewModel = activityLogViewModel
         self.workoutSessionViewModel = workoutSessionViewModel
+        self.activityMonitor = activityMonitor
         self._timeRemaining = State(initialValue: exercise.duration * 60) // Convert minutes to seconds
     }
 
@@ -38,6 +40,8 @@ struct TimerView: View {
         // Log the completed exercise
         activityLogViewModel.addExerciseComplete(exercise: exercise)
         workoutSessionViewModel.addExerciseToSession(exercise: exercise)
+        // Reset the reminder notification schedule after exercise completion
+        activityMonitor?.resetReminderFromNow()
         // Navigate back to exercise detail view
         dismiss()
     }
