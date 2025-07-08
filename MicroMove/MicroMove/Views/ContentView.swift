@@ -60,9 +60,6 @@ struct ContentView: View {
                         Button("Activity Log") {
                             showActivityLog = true
                         }
-                        Button("Test Reminder") {
-                            activityMonitor?.checkAndScheduleReminder()
-                        }
                     } label: {
                         Image(systemName: "line.3.horizontal")
                     }
