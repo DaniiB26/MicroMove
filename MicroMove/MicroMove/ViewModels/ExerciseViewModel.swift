@@ -69,4 +69,19 @@ class ExercisesViewModel: ObservableObject {
             errorMessage = "Error deleting exercise: \(error.localizedDescription)"
         }
     }
+
+    func deleteAllExercises(modelContext: ModelContext) {
+        let fetchDescriptor = FetchDescriptor<Exercise>()
+        if let exercises = try? modelContext.fetch(fetchDescriptor) {
+            for exercise in exercises {
+                modelContext.delete(exercise)
+            }
+            try? modelContext.save()
+        }
+    }
+
+    func markExerciseAsDone(_ exercise: Exercise) {
+        exercise.isCompleted = true
+        updateExercise(exercise)
+    }
 }

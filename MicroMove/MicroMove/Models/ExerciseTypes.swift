@@ -14,6 +14,7 @@ enum BodyPart: String, Codable, CaseIterable {
     case legs = "Legs"
     case back = "Back"
     case chest = "Chest"
+    case abs = "Abs"
     case shoulders = "Shoulders"
     case fullBody = "Full Body"
 }

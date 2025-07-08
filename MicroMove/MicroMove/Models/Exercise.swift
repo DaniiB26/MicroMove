@@ -22,6 +22,10 @@ final class Exercise {
     var isCompleted: Bool
     /// Name of the image asset for the exercise.
     var image: String
+    /// Instructions for the exercise.
+    var instructions: [String] = []
+    /// Visual guide for the exercise.
+    var visualGuide: [String] = []
 
     /// Initializes a new Exercise.
     init(
@@ -33,7 +37,9 @@ final class Exercise {
         duration: Int,
         createdAt: Date = Date(),
         isCompleted: Bool = false,
-        image: String
+        image: String,
+        instructions: [String],
+        visualGuide: [String]
     ) {
         self.id = id
         self.name = name
@@ -44,5 +50,7 @@ final class Exercise {
         self.createdAt = createdAt
         self.isCompleted = isCompleted
         self.image = image
+        self.instructions = instructions
+        self.visualGuide = visualGuide
     }
 }
