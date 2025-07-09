@@ -43,7 +43,7 @@ struct TimerView: View {
         activityLogViewModel.addExerciseComplete(exercise: exercise)
         workoutSessionViewModel.addExerciseToSession(exercise: exercise)
         // Reset the reminder notification schedule after exercise completion
-        activityMonitor?.resetReminderFromNow()
+        activityMonitor?.resetInactivityReminder()
         // Mark the exercise as done
         exerciseViewModel.markExerciseAsDone(exercise)
         // Navigate back to exercise detail view

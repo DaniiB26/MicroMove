@@ -21,8 +21,8 @@ struct ExerciseDetailView: View {
                         Text(exercise.name)
                             .font(.largeTitle).bold()
                             .foregroundColor(.accentColor)
-                        Text(exercise.exerciseDesc)
-                            .font(.body)
+            Text(exercise.exerciseDesc)
+                .font(.body)
                             .foregroundColor(.primary)
                         HStack(spacing: 16) {
                             Label("\(exercise.type.rawValue.capitalized)", systemImage: "bolt.heart")
@@ -38,7 +38,7 @@ struct ExerciseDetailView: View {
                     }
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemBackground)).shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2))
-                    Spacer()
+            Spacer()
                 }
 
                 // Completion Status Indicator
@@ -66,9 +66,9 @@ struct ExerciseDetailView: View {
                             .foregroundColor(.accentColor)
                         Image(exercise.visualGuide[currentGuideIndex])
                             .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .cornerRadius(16)
-                            .shadow(radius: 8)
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(16)
+                .shadow(radius: 8)
                             .onTapGesture {
                                 // Advance to next image, loop back to start
                                 currentGuideIndex = (currentGuideIndex + 1) % exercise.visualGuide.count
@@ -111,27 +111,27 @@ struct ExerciseDetailView: View {
                 }) {
                     Label("Mark as Done", systemImage: "checkmark.circle")
                         .font(.headline)
-                        .padding()
+                .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.accentColor.opacity(0.15))
                         .cornerRadius(10)
                 }
                 .accessibilityLabel("Mark as Done")
 
-                Button(action: {
-                    activityLogViewModel.addExerciseStart(exercise: exercise)
-                    showTimer = true
-                }) {
-                    Label("Start Exercise", systemImage: "play.circle")
-                        .font(.headline)
-                        .padding()
-                        .frame(maxWidth: .infinity)
+            Button(action: {
+                activityLogViewModel.addExerciseStart(exercise: exercise)
+                showTimer = true
+            }) {
+                Label("Start Exercise", systemImage: "play.circle")
+                    .font(.headline)
+                    .padding()
+                    .frame(maxWidth: .infinity)
                         .background(Color.accentColor.opacity(0.15))
                         .cornerRadius(10)
-                }
-                .accessibilityLabel("Start Exercise")
             }
-            .padding()
+            .accessibilityLabel("Start Exercise")
+        }
+        .padding()
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationDestination(isPresented: $showTimer) {
