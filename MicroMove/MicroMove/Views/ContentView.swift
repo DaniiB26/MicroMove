@@ -10,6 +10,8 @@ struct ContentView: View {
     @StateObject private var activityLogViewModel: ActivityLogViewModel
     @StateObject private var userPreferencesViewModel: UserPreferencesViewModel
     @StateObject private var workoutSessionViewModel: WorkoutSessionViewModel
+    @StateObject private var achievementsViewModel: AchievementsViewModel
+    @StateObject private var progressViewModel: ProgressViewModel
     @State private var activityMonitor: ActivityMonitor? = nil
 
     init(modelContext: ModelContext) {
@@ -17,16 +19,24 @@ struct ContentView: View {
         _activityLogViewModel = StateObject(wrappedValue: ActivityLogViewModel(modelContext: modelContext))
         _userPreferencesViewModel = StateObject(wrappedValue: UserPreferencesViewModel(modelContext: modelContext))
         _workoutSessionViewModel = StateObject(wrappedValue: WorkoutSessionViewModel(modelContext: modelContext))
+        let achievementsVM = AchievementsViewModel(modelContext: modelContext)
+        _achievementsViewModel = StateObject(wrappedValue: achievementsVM)
+        _progressViewModel = StateObject(wrappedValue: ProgressViewModel(modelContext: modelContext, achievementsViewModel: achievementsVM))
     }
 
     var body: some View {
         NavigationStack {
-            // Show the exercise list with filtering and sorting
-            ExerciseListView(exerciseViewModel: ExercisesViewModel(modelContext: modelContext), activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor)
+            ExerciseListView(
+                exerciseViewModel: ExercisesViewModel(modelContext: modelContext),
+                activityLogViewModel: activityLogViewModel,
+                workoutSessionViewModel: workoutSessionViewModel,
+                progressViewModel: progressViewModel,
+                activityMonitor: activityMonitor
+            )
 
             NavigationLink(
                 destination: AchievementListView(
-                    viewModel: AchievementsViewModel(modelContext: modelContext)
+                    viewModel: achievementsViewModel
                 ),
                 isActive: $showAchievements
             ) {
@@ -35,7 +45,7 @@ struct ContentView: View {
 
             NavigationLink(
                 destination: ActivityListView(
-                    viewModel: ActivityLogViewModel(modelContext: modelContext)
+                    viewModel: activityLogViewModel
                 ),
                 isActive: $showActivityLog
             ) {
@@ -45,7 +55,7 @@ struct ContentView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing){
                     NavigationLink(
-                        destination: ProgressView(viewModel: ProgressViewModel(modelContext: modelContext)) 
+                        destination: ProgressView(viewModel: progressViewModel)
                     )
                     {
                         Image(systemName: "person")

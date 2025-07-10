@@ -6,6 +6,7 @@ import SwiftData
 class ProgressViewModel: ObservableObject {
     /// The list of all workout sessions, published for UI updates.
     @Published var workoutSessions: [WorkoutSession] = []
+    @Published var achievements: [Achievement] = []
     /// Error message for UI display, if any operation fails.
     @Published var errorMessage: String?
 
@@ -15,9 +16,11 @@ class ProgressViewModel: ObservableObject {
     @Published var activeDays: Set<Date> = []
 
     private var modelContext: ModelContext
+    private var achievementsViewModel: AchievementsViewModel
 
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext, achievementsViewModel: AchievementsViewModel) {
         self.modelContext = modelContext
+        self.achievementsViewModel = achievementsViewModel
         refreshProgress()
     }
 
@@ -38,6 +41,7 @@ class ProgressViewModel: ObservableObject {
         calculateDailyProgress()
         calculateStreaks()
         calculateActiveDays()
+        checkForAchievements()
     }
 
     /// Aggregates daily progress from workout sessions
@@ -106,5 +110,30 @@ class ProgressViewModel: ObservableObject {
         let totalExercises = monthSessions.reduce(0) { $0 + $1.exercises.count }
         let totalDuration = monthSessions.reduce(0) { $0 + $1.duration }
         return (totalExercises, totalDuration)
+    }
+
+    func checkForAchievements() {
+        // Ensure achievements are up-to-date
+        achievementsViewModel.fetchAchievements()
+        achievements = achievementsViewModel.achievements
+        let totalExercises = workoutSessions.reduce(0) { $0 + $1.exercises.count }
+        let totalMinutes = workoutSessions.reduce(0) { $0 + $1.duration }
+        for achievement in achievements {
+            guard !achievement.isUnlocked else { continue }
+            let requirementMet: Bool
+            switch achievement.type {
+            case .streak:
+                requirementMet = currentStreak >= achievement.requirement
+            case .totalExercises:
+                requirementMet = totalExercises >= achievement.requirement
+            case .totalMinutes:
+                requirementMet = totalMinutes >= achievement.requirement
+            }
+            if requirementMet {
+                achievement.isUnlocked = true
+                achievement.unlockedAt = Date()
+                achievementsViewModel.updateAchievement(achievement)
+            }
+        }
     }
 }

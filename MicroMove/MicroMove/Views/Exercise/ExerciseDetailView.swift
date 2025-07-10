@@ -6,6 +6,7 @@ struct ExerciseDetailView: View {
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @ObservedObject var exerciseViewModel: ExercisesViewModel
+    @ObservedObject var progressViewModel: ProgressViewModel
     @State private var showTimer = false
     @State private var currentGuideIndex = 0
     var activityMonitor: ActivityMonitor? = nil
@@ -135,7 +136,7 @@ struct ExerciseDetailView: View {
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationDestination(isPresented: $showTimer) {
-            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor, exerciseViewModel: exerciseViewModel)
+            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor, exerciseViewModel: exerciseViewModel, progressViewModel: progressViewModel)
         }
     }
 }
