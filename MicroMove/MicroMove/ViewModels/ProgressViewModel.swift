@@ -9,6 +9,7 @@ class ProgressViewModel: ObservableObject {
     @Published var achievements: [Achievement] = []
     /// Error message for UI display, if any operation fails.
     @Published var errorMessage: String?
+    @Published var lastUnlockedAchievement: Achievement?
 
     @Published var dailyProgress: [Date: (exercises: Int, duration: Int)] = [:]
     @Published var currentStreak: Int = 0
@@ -118,6 +119,7 @@ class ProgressViewModel: ObservableObject {
         achievements = achievementsViewModel.achievements
         let totalExercises = workoutSessions.reduce(0) { $0 + $1.exercises.count }
         let totalMinutes = workoutSessions.reduce(0) { $0 + $1.duration }
+        var newlyUnlocked: Achievement? = nil
         for achievement in achievements {
             guard !achievement.isUnlocked else { continue }
             let requirementMet: Bool
@@ -133,6 +135,16 @@ class ProgressViewModel: ObservableObject {
                 achievement.isUnlocked = true
                 achievement.unlockedAt = Date()
                 achievementsViewModel.updateAchievement(achievement)
+                newlyUnlocked = achievement
+            }
+        }
+        if let unlocked = newlyUnlocked {
+            lastUnlockedAchievement = unlocked
+            // Reset after a short delay to allow repeated unlocks
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                if self.lastUnlockedAchievement?.id == unlocked.id {
+                    self.lastUnlockedAchievement = nil
+                }
             }
         }
     }
