@@ -97,7 +97,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - Date calculations
     - Data visualization
 
-- [ ] Task 6: Achievement System
+- [X] Task 6: Achievement System
   - ✅ Success Criteria
     - Achievement definitions
     - Progress tracking
@@ -146,7 +146,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [X] Task 3: Exercise Library Implementation
 - [X] Task 4: Activity Detection System
 - [X] Task 5: Progress Tracking Implementation
-- [ ] Task 6: Achievement System
+- [X] Task 6: Achievement System
 - [ ] Task 7: UI Polish and Animations
 - [ ] Task 8: Testing and Optimization
 
@@ -173,6 +173,9 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 >
 > **Task 5:**
 > - ProgressViewModel refactored to use WorkoutSession only. Daily/weekly/monthly stats, streaks, active days. ProgressView shows stats, streaks, calendar, and session details. Manual/automated tests pass. No blockers. Ready for Task 6.
+>
+> **Task 6:**
+> - Achievement system implemented: definitions, progress tracking, and notifications. Achievements are unlocked based on streaks, total exercises, and total minutes. ProgressViewModel observes workout data and updates achievements. Banner notification appears when an achievement is unlocked. Manual and automated tests confirm correct unlocking and UI feedback. No blockers. Ready for UI polish.
 
 ---
 
@@ -192,5 +195,11 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
   - UI feedback (animations, cards) boosts engagement
   - Simulated data/testing catches edge cases
   - Documenting logic helps onboarding
+- **Achievement System:**
+  - Used observer pattern to react to progress changes and unlock achievements in real time
+  - Banner feedback for unlocked achievements increases user motivation
+  - Grouping/sorting achievements in UI improves clarity
+  - Manual and automated tests caught edge cases (e.g., unlocking multiple achievements at once)
+  - Documenting achievement logic helps future expansion
 
 ---
