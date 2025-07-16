@@ -37,6 +37,7 @@ class ExercisesViewModel: ObservableObject {
         do {
             let descriptor = FetchDescriptor<Exercise>()
             exercises = try modelContext.fetch(descriptor)
+            print("[ExercisesViewModel] Successfully fetched exercises.")
         } catch {
             errorMessage = "Error fetching exercises: \(error.localizedDescription)"
             exercises = []
@@ -47,12 +48,14 @@ class ExercisesViewModel: ObservableObject {
     func addExercise(_ exercise: Exercise) {
         modelContext.insert(exercise)
         exercises.append(exercise)
+        print("[ExercisesViewModel] Added exercise: \(exercise.name)")
     }
 
     /// Saves changes to an existing exercise. Call after modifying an exercise's properties.
     func updateExercise(_ exercise: Exercise) {
         do {
             try modelContext.save()
+            print("[ExercisesViewModel] Updated exercise: \(exercise.name)")
             // Optionally update the item in the array if needed
         } catch {
             errorMessage = "Error updating exercise: \(error.localizedDescription)"
@@ -65,11 +68,13 @@ class ExercisesViewModel: ObservableObject {
             modelContext.delete(exercise)
             try modelContext.save()
             exercises.removeAll { $0.id == exercise.id }
+            print("[ExercisesViewModel] Deleted exercise: \(exercise.name)")
         } catch {
             errorMessage = "Error deleting exercise: \(error.localizedDescription)"
         }
     }
 
+    /// Deletes all exercises from the data store.
     func deleteAllExercises(modelContext: ModelContext) {
         let fetchDescriptor = FetchDescriptor<Exercise>()
         if let exercises = try? modelContext.fetch(fetchDescriptor) {
@@ -77,11 +82,14 @@ class ExercisesViewModel: ObservableObject {
                 modelContext.delete(exercise)
             }
             try? modelContext.save()
+            print("[ExercisesViewModel] Deleted all exercises.")
         }
     }
 
+    /// Marks an exercise as done (completed) and updates it in the data store.
     func markExerciseAsDone(_ exercise: Exercise) {
         exercise.isCompleted = true
         updateExercise(exercise)
+        print("[ExercisesViewModel] Marked exercise as done: \(exercise.name)")
     }
 }

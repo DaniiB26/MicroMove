@@ -21,6 +21,7 @@ class WorkoutSessionViewModel: ObservableObject {
         do {
             let descriptor = FetchDescriptor<WorkoutSession>()
             workoutSessions = try modelContext.fetch(descriptor)
+            print("[WorkoutSessionViewModel] Successfully fetched workout sessions.")
         } catch {
             errorMessage = "Error fetching workout sessions: \(error.localizedDescription)"
             workoutSessions = []
@@ -31,12 +32,14 @@ class WorkoutSessionViewModel: ObservableObject {
     func addWorkoutSession(_ session: WorkoutSession) {
         modelContext.insert(session)
         workoutSessions.append(session)
+        print("[WorkoutSessionViewModel] Added workout session for date: \(session.date)")
     }
 
     /// Saves changes to an existing workout session. Call after modifying a session's properties.
     func updateWorkoutSession(_ session: WorkoutSession) {
         do {
             try modelContext.save()
+            print("[WorkoutSessionViewModel] Updated workout session for date: \(session.date)")
             // Optionally update the item in the array if needed
         } catch {
             errorMessage = "Error updating workout session: \(error.localizedDescription)"
@@ -49,11 +52,13 @@ class WorkoutSessionViewModel: ObservableObject {
             modelContext.delete(session)
             try modelContext.save()
             workoutSessions.removeAll { $0.id == session.id }
+            print("[WorkoutSessionViewModel] Deleted workout session for date: \(session.date)")
         } catch {
             errorMessage = "Error deleting workout session: \(error.localizedDescription)"
         }
     }
 
+    /// Adds an exercise to today's workout session, or creates a new session if none exists.
     func addExerciseToSession(exercise: Exercise) {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
@@ -71,14 +76,14 @@ class WorkoutSessionViewModel: ObservableObject {
             updateWorkoutSession(session)
             do {
                 try modelContext.save()
-                print("[WorkoutSession] Updated today's session:")
+                print("[WorkoutSessionViewModel] Updated today's session:")
                 print("  Date: \(session.date)")
                 print("  Exercises: \(session.exercises.map { $0.name }) (\(session.exercises.count) total)")
                 print("  Duration: \(session.duration) min")
                 print("  StartedAt: \(String(describing: session.startedAt))")
                 print("  CompletedAt: \(String(describing: session.completedAt))")
             } catch {
-                print("[WorkoutSession] Error saving updated session: \(error)")
+                print("[WorkoutSessionViewModel] Error saving updated session: \(error)")
             }
         } else {
             let completedAt = now + TimeInterval(exercise.duration * 60)
@@ -92,14 +97,14 @@ class WorkoutSessionViewModel: ObservableObject {
             addWorkoutSession(newSession)
             do {
                 try modelContext.save()
-                print("[WorkoutSession] Created new session for today:")
+                print("[WorkoutSessionViewModel] Created new session for today:")
                 print("  Date: \(newSession.date)")
                 print("  Exercises: \(newSession.exercises.map { $0.name }) (1 total)")
                 print("  Duration: \(newSession.duration) min")
                 print("  StartedAt: \(String(describing: newSession.startedAt))")
                 print("  CompletedAt: \(String(describing: newSession.completedAt))")
             } catch {
-                print("[WorkoutSession] Error saving new session: \(error)")
+                print("[WorkoutSessionViewModel] Error saving new session: \(error)")
             }
         }
     }

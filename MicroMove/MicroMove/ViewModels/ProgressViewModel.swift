@@ -30,19 +30,21 @@ class ProgressViewModel: ObservableObject {
         do {
             let descriptor = FetchDescriptor<WorkoutSession>()
             workoutSessions = try modelContext.fetch(descriptor)
+            print("[ProgressViewModel] Successfully fetched workout sessions.")
         } catch {
             errorMessage = "Error fetching workout sessions: \(error.localizedDescription)"
             workoutSessions = []
         }
     }
 
-    /// Refreshes all progress data (sessions, daily progress, streaks, active days)
+    /// Refreshes all progress data (sessions, daily progress, streaks, active days, achievements).
     func refreshProgress() {
         fetchWorkoutSessions()
         calculateDailyProgress()
         calculateStreaks()
         calculateActiveDays()
         checkForAchievements()
+        print("[ProgressViewModel] Refreshed all progress data.")
     }
 
     /// Aggregates daily progress from workout sessions
@@ -54,6 +56,7 @@ class ProgressViewModel: ObservableObject {
             progressByDay[day] = (session.exercises.count, session.duration)
         }
         dailyProgress = progressByDay
+        print("[ProgressViewModel] Calculated daily progress.")
     }
 
     /// Calculates current and longest streaks from daily progress
@@ -79,12 +82,14 @@ class ProgressViewModel: ObservableObject {
         }
         currentStreak = streak
         longestStreak = maxStreak
+        print("[ProgressViewModel] Calculated streaks. Current: \(currentStreak), Longest: \(longestStreak)")
     }
 
-    /// Calculates the set of days with at least one workout session (for calendar views)
+    /// Calculates the set of days with at least one workout session (for calendar views).
     func calculateActiveDays() {
         let calendar = Calendar.current
         activeDays = Set(workoutSessions.map { calendar.startOfDay(for: $0.date) })
+        print("[ProgressViewModel] Calculated active days.")
     }
 
     /// Returns all workout sessions for a given day
@@ -113,6 +118,7 @@ class ProgressViewModel: ObservableObject {
         return (totalExercises, totalDuration)
     }
 
+    /// Checks and unlocks achievements based on current progress.
     func checkForAchievements() {
         // Ensure achievements are up-to-date
         achievementsViewModel.fetchAchievements()
@@ -140,6 +146,7 @@ class ProgressViewModel: ObservableObject {
         }
         if let unlocked = newlyUnlocked {
             lastUnlockedAchievement = unlocked
+            print("[ProgressViewModel] Unlocked achievement: \(unlocked.title)")
             // Reset after a short delay to allow repeated unlocks
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 if self.lastUnlockedAchievement?.id == unlocked.id {

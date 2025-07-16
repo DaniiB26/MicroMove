@@ -32,6 +32,7 @@ class UserPreferencesViewModel: ObservableObject {
                 reminderTime = prefs.reminderTime
                 quietHoursStart = prefs.quietHoursStart
                 quietHoursEnd = prefs.quietHoursEnd
+                print("[UserPreferencesViewModel] Fetched user preferences.")
             } else {
                 userPreferences = nil
             }
@@ -60,6 +61,7 @@ class UserPreferencesViewModel: ObservableObject {
         }
         do {
             try modelContext.save()
+            print("[UserPreferencesViewModel] Saved user preferences.")
         } catch {
             errorMessage = "Error saving user preferences: \(error.localizedDescription)"
         }
@@ -69,12 +71,14 @@ class UserPreferencesViewModel: ObservableObject {
     func addUserPreferences(_ preferences: UserPreferences) {
         modelContext.insert(preferences)
         userPreferences = preferences
+        print("[UserPreferencesViewModel] Added user preferences.")
     }
 
     /// Updates the user's preferences. (Deprecated: use savePreferences instead)
     func updateUserPreferences(_ preferences: UserPreferences) {
         do {
             try modelContext.save()
+            print("[UserPreferencesViewModel] Updated user preferences.")
             // Optionally update the property if needed
         } catch {
             errorMessage = "Error updating user preferences: \(error.localizedDescription)"
@@ -87,6 +91,7 @@ class UserPreferencesViewModel: ObservableObject {
             modelContext.delete(preferences)
             try modelContext.save()
             userPreferences = nil
+            print("[UserPreferencesViewModel] Deleted user preferences.")
         } catch {
             errorMessage = "Error deleting user preferences: \(error.localizedDescription)"
         }

@@ -22,6 +22,7 @@ class ActivityLogViewModel: ObservableObject {
         do {
             let descriptor = FetchDescriptor<ActivityLog>()
             activityLogs = try modelContext.fetch(descriptor)
+            print("[ActivityLogViewModel] Successfully fetched activity logs.")
         } catch {
             errorMessage = "Error fetching activity logs: \(error.localizedDescription)"
             activityLogs = []
@@ -32,12 +33,14 @@ class ActivityLogViewModel: ObservableObject {
     func addActivityLog(_ activityLog: ActivityLog) {
         modelContext.insert(activityLog)
         activityLogs.append(activityLog)
+        print("[ActivityLogViewModel] Added activity log: \(activityLog.activityDesc)")
     }
 
     /// Saves changes to an existing activity log. Call after modifying an activity log's properties.
     func updateActivityLog(_ activityLog: ActivityLog) {
         do {
             try modelContext.save()
+            print("[ActivityLogViewModel] Updated activity log: \(activityLog.activityDesc)")
             // Optionally update the item in the array if needed
         } catch {
             errorMessage = "Error updating activity log: \(error.localizedDescription)"
@@ -50,11 +53,13 @@ class ActivityLogViewModel: ObservableObject {
             modelContext.delete(activityLog)
             try modelContext.save()
             activityLogs.removeAll { $0.id == activityLog.id }
+            print("[ActivityLogViewModel] Deleted activity log: \(activityLog.activityDesc)")
         } catch {
             errorMessage = "Error deleting activity log: \(error.localizedDescription)"
         }
     }
 
+    /// Determines the time-of-day context for a given date.
     private func getDayContext(for date: Date) -> ActivityLog.ActivityDayContext {
         let hour = Calendar.current.component(.hour, from: date)
         switch hour {
@@ -65,6 +70,7 @@ class ActivityLogViewModel: ObservableObject {
         }
     }
 
+    /// Logs an app open event.
     func addAppOpen() {
         let now = Date()
         let log = ActivityLog(
@@ -78,6 +84,7 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs the start of an exercise.
     func addExerciseStart(exercise: Exercise) {
         let now = Date()
         let log = ActivityLog(
@@ -91,6 +98,7 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs the completion of an exercise.
     func addExerciseComplete(exercise: Exercise) {
         let now = Date()
         let log = ActivityLog(
@@ -104,6 +112,7 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs when a reminder is triggered.
     func addReminderTriggered() {
         let now = Date()
         let log = ActivityLog(
@@ -117,6 +126,7 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs when a reminder is responded to by the user.
     func addReminderResponded() {
         let now = Date()
         let log = ActivityLog(
@@ -130,6 +140,7 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs when inactivity is detected.
     func addInactivityDetected(inactiveTime: TimeInterval) {
         let now = Date()
         let log = ActivityLog(
