@@ -112,21 +112,7 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - Achievement design
 
 ### Phase 4: Polish and Testing
-- [ ] Task 7: UI Polish and Animations
-  - ✅ Success Criteria
-    - Smooth transitions
-    - Loading states
-    - Error handling
-  - 🎯 Learning Goal
-    - SwiftUI animations
-    - Error handling patterns
-    - Loading state management
-  - 📘 Educator Notes
-    - Animation APIs
-    - Error handling best practices
-    - Loading state patterns
-
-- [ ] Task 8: Testing and Optimization
+- [ ] Task 7: Testing and Optimization
   - ✅ Success Criteria
     - Unit tests for core logic
     - UI tests for critical flows
@@ -140,6 +126,21 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - Performance testing
     - Debug tools
 
+- [ ] Task 8: UI Polish and Animations
+  - ✅ Success Criteria
+    - Smooth transitions
+    - Loading states
+    - Error handling
+  - 🎯 Learning Goal
+    - SwiftUI animations
+    - Error handling patterns
+    - Loading state management
+  - 📘 Educator Notes
+    - Animation APIs
+    - Error handling best practices
+    - Loading state patterns
+
+
 ## Project Status Board
 - [X] Task 1: Project Setup and Basic Architecture
 - [X] Task 2: Exercise Data Model and Storage
@@ -147,8 +148,8 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [X] Task 4: Activity Detection System
 - [X] Task 5: Progress Tracking Implementation
 - [X] Task 6: Achievement System
-- [ ] Task 7: UI Polish and Animations
-- [ ] Task 8: Testing and Optimization
+- [ ] Task 7: Testing and Optimization
+- [ ] Task 8: UI Polish and Animations
 
 ---
 
@@ -203,3 +204,4 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
   - Documenting achievement logic helps future expansion
 
 ---
+
