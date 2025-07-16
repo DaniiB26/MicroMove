@@ -27,6 +27,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                                didReceive response: UNNotificationResponse,
                                withCompletionHandler completionHandler: @escaping () -> Void) {
         let identifier = response.notification.request.identifier
+        // Delegate business logic to ActivityMonitor and ActivityLogViewModel
         if identifier.contains("movement-reminder") {
             activityLogViewModel?.addReminderResponded()
             print("[AppDelegate] User responded to movement reminder")
@@ -41,6 +42,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     /// Called when the app becomes active. Checks and schedules inactivity reminders.
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("[AppDelegate] App became active")
+        // Delegate to ActivityMonitor for reminder logic
         activityMonitor?.handlePossibleContinuedInactivity()
     }
 }

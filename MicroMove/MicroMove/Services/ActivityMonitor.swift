@@ -1,22 +1,24 @@
 import Foundation
 import UserNotifications
 
-/// ActivityMonitor: Handles inactivity detection and reminder scheduling.
+/// ActivityMonitor: Handles inactivity detection and delegates notification scheduling.
 @MainActor
 class ActivityMonitor {
     private let activityLogViewModel: ActivityLogViewModel
     private let userPreferencesViewModel: UserPreferencesViewModel
+    private let notificationService: NotificationService
     private let reminderNotificationIdentifier = "movement-reminder"
 
-    init(activityLogViewModel: ActivityLogViewModel, userPreferencesViewModel: UserPreferencesViewModel) {
+    init(activityLogViewModel: ActivityLogViewModel, userPreferencesViewModel: UserPreferencesViewModel, notificationService: NotificationService = NotificationService()) {
         self.activityLogViewModel = activityLogViewModel
         self.userPreferencesViewModel = userPreferencesViewModel
+        self.notificationService = notificationService
         requestNotificationPermission()
     }
 
     /// Request notification permission from the user.
     func requestNotificationPermission() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        notificationService.requestAuthorization { granted, error in
             if granted {
                 print("[ActivityMonitor] Notification permission granted.")
             } else if let error = error {
@@ -28,15 +30,15 @@ class ActivityMonitor {
     /// Call this after any user activity (exercise, app open, etc.)
     func resetInactivityReminder() {
         print("[ActivityMonitor] resetInactivityReminder called at \(Date())")
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [reminderNotificationIdentifier])
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [reminderNotificationIdentifier])
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
-        }
-        if !isInQuietHours() {
-            scheduleInactivityReminder()
-        } else {
-            print("[ActivityMonitor] Not scheduling inactivity reminder: in quiet hours.")
+        notificationService.removeNotifications(identifiers: [reminderNotificationIdentifier]) {
+            self.notificationService.getPendingRequests { requests in
+                print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
+                if !self.isInQuietHours() {
+                    self.scheduleInactivityReminder()
+                } else {
+                    print("[ActivityMonitor] Not scheduling inactivity reminder: in quiet hours.")
+                }
+            }
         }
     }
 
@@ -69,13 +71,12 @@ class ActivityMonitor {
         content.body = "You've been inactive for a while. Let's get moving!"
         content.sound = .default
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: triggerTime, repeats: false)
-        let request = UNNotificationRequest(identifier: reminderNotificationIdentifier, content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request) { error in
+        notificationService.scheduleNotification(identifier: reminderNotificationIdentifier, content: content, trigger: trigger) { error in
             if let error = error {
                 print("[ActivityMonitor] Failed to schedule inactivity reminder: \(error)")
             } else {
                 print("[ActivityMonitor] Inactivity reminder scheduled in \(triggerTime) seconds.")
-                UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+                self.notificationService.getPendingRequests { requests in
                     print("[ActivityMonitor] Pending notifications after scheduling: \(requests.map { $0.identifier })")
                 }
             }
@@ -85,15 +86,15 @@ class ActivityMonitor {
     /// Checks inactivity and schedules a reminder if the user has been inactive for the full interval and it's not quiet hours.
     func checkAndScheduleReminder() {
         print("[ActivityMonitor] checkAndScheduleReminder called at \(Date())")
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [reminderNotificationIdentifier])
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [reminderNotificationIdentifier])
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
-            print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
-        }
-        if shouldSendReminder() {
-            scheduleInactivityReminder()
-        } else {
-            print("[ActivityMonitor] No reminder scheduled: either not inactive long enough or in quiet hours.")
+        notificationService.removeNotifications(identifiers: [reminderNotificationIdentifier]) {
+            self.notificationService.getPendingRequests { requests in
+                print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
+                if self.shouldSendReminder() {
+                    self.scheduleInactivityReminder()
+                } else {
+                    print("[ActivityMonitor] No reminder scheduled: either not inactive long enough or in quiet hours.")
+                }
+            }
         }
     }
 
