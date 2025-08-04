@@ -13,26 +13,43 @@ protocol NotificationServiceProtocol {
     func getPendingRequests(completion: @escaping ([UNNotificationRequest]) -> Void)
 }
 
-/// Concrete implementation of NotificationServiceProtocol using UNUserNotificationCenter
+/// Protocol to abstract UNUserNotificationCenter for dependency injection
+protocol UserNotificationCenterProtocol {
+    func requestAuthorization(options: UNAuthorizationOptions, completionHandler: @escaping (Bool, Error?) -> Void)
+    func add(_ request: UNNotificationRequest, withCompletionHandler completionHandler: ((Error?) -> Void)?)
+    func removePendingNotificationRequests(withIdentifiers identifiers: [String])
+    func removeDeliveredNotifications(withIdentifiers identifiers: [String])
+    func getPendingNotificationRequests(completionHandler: @escaping ([UNNotificationRequest]) -> Void)
+}
+
+extension UNUserNotificationCenter: UserNotificationCenterProtocol {}
+
+/// Concrete implementation of NotificationServiceProtocol using dependency injection
 class NotificationService: NotificationServiceProtocol {
+    private let center: UserNotificationCenterProtocol
+
+    init(center: UserNotificationCenterProtocol = UNUserNotificationCenter.current()) {
+        self.center = center
+    }
+
     func requestAuthorization(completion: ((Bool, Error?) -> Void)?) {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
             completion?(granted, error)
         }
     }
     func scheduleNotification(identifier: String, content: UNNotificationContent, trigger: UNNotificationTrigger, completion: ((Error?) -> Void)?) {
         let request = UNNotificationRequest(identifier: identifier, content: content, trigger: trigger)
-        UNUserNotificationCenter.current().add(request) { error in
+        center.add(request) { error in
             completion?(error)
         }
     }
     func removeNotifications(identifiers: [String], completion: (() -> Void)?) {
-        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
-        UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: identifiers)
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
+        center.removeDeliveredNotifications(withIdentifiers: identifiers)
         completion?()
     }
     func getPendingRequests(completion: @escaping ([UNNotificationRequest]) -> Void) {
-        UNUserNotificationCenter.current().getPendingNotificationRequests { requests in
+        center.getPendingNotificationRequests { requests in
             completion(requests)
         }
     }

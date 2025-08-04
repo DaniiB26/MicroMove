@@ -6,10 +6,10 @@ import UserNotifications
 class ActivityMonitor {
     private let activityLogViewModel: ActivityLogViewModel
     private let userPreferencesViewModel: UserPreferencesViewModel
-    private let notificationService: NotificationService
+    private let notificationService: NotificationServiceProtocol
     private let reminderNotificationIdentifier = "movement-reminder"
 
-    init(activityLogViewModel: ActivityLogViewModel, userPreferencesViewModel: UserPreferencesViewModel, notificationService: NotificationService = NotificationService()) {
+    init(activityLogViewModel: ActivityLogViewModel, userPreferencesViewModel: UserPreferencesViewModel, notificationService: NotificationServiceProtocol = NotificationService()) {
         self.activityLogViewModel = activityLogViewModel
         self.userPreferencesViewModel = userPreferencesViewModel
         self.notificationService = notificationService
