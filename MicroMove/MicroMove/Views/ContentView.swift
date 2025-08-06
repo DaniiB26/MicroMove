@@ -28,67 +28,61 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .top) {
-            NavigationStack {
-                ExerciseListView(
-                    exerciseViewModel: ExercisesViewModel(modelContext: modelContext),
-                    activityLogViewModel: activityLogViewModel,
-                    workoutSessionViewModel: workoutSessionViewModel,
-                    progressViewModel: progressViewModel,
-                    activityMonitor: activityMonitor
-                )
 
-                NavigationLink(
-                    destination: AchievementListView(
-                        viewModel: achievementsViewModel
-                    ),
-                    isActive: $showAchievements
-                ) {
-                    EmptyView()
-                }
+            BottomTabBar(
+                modelContext: modelContext,
+                progressViewModel: progressViewModel,
+                userPreferencesViewModel: userPreferencesViewModel,
+                activityLogViewModel: activityLogViewModel,
+                workoutSessionViewModel: workoutSessionViewModel,
+                activityMonitor: activityMonitor
+            )
 
-                NavigationLink(
-                    destination: ActivityListView(
-                        viewModel: activityLogViewModel
-                    ),
-                    isActive: $showActivityLog
-                ) {
-                    EmptyView()
-                }
 
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing){
-                        NavigationLink(
-                            destination: ProgressView(viewModel: progressViewModel)
-                        )
-                        {
-                            Image(systemName: "person")
-                        }
-                        .accessibilityLabel("Progress")
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Menu {
-                            Button("Achievements") {
-                                showAchievements = true
-                            }
-                            Button("Activity Log") {
-                                showActivityLog = true
-                            }
-                        } label: {
-                            Image(systemName: "line.3.horizontal")
-                        }
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(
-                            destination: UserPreferencesView(
-                                viewModel: userPreferencesViewModel
-                            )
-                        ) {
-                            Image(systemName: "gearshape")
-                        }
-                        .accessibilityLabel("User Preferences")
-                    }
-                }
-            }
+            // NavigationStack {
+            //     VStack(spacing: 16) {
+            //         HomeView(progressViewModel: progressViewModel)
+            //         BottomTabBar(progressViewModel: progressViewModel)
+            //     }
+            //     .padding(.horizontal)
+            //     .padding(.top, 12)
+            //     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            //     .background(Color(.systemGray6)) 
+
+                // .toolbar {
+                //     ToolbarItem(placement: .navigationBarTrailing){
+                //         NavigationLink(
+                //             destination: ProgressView(viewModel: progressViewModel)
+                //         )
+                //         {
+                //             Image(systemName: "person")
+                //         }
+                //         .accessibilityLabel("Progress")
+                //     }
+                //     ToolbarItem(placement: .navigationBarTrailing) {
+                //         Menu {
+                //             Button("Achievements") {
+                //                 showAchievements = true
+                //             }
+                //             Button("Activity Log") {
+                //                 showActivityLog = true
+                //             }
+                //         } label: {
+                //             Image(systemName: "line.3.horizontal")
+                //         }
+                //     }
+                //     ToolbarItem(placement: .navigationBarTrailing) {
+                //         NavigationLink(
+                //             destination: UserPreferencesView(
+                //                 viewModel: userPreferencesViewModel
+                //             )
+                //         ) {
+                //             Image(systemName: "gearshape")
+                //         }
+                //         .accessibilityLabel("User Preferences")
+                //     }
+                // }
+            //}
             if showAchievementBanner, let achievement = bannerAchievement {
                 HStack(spacing: 12) {
                     Image(systemName: "star.fill")
@@ -134,32 +128,32 @@ struct ContentView: View {
                 .accessibilityLabel("Achievement Unlocked: \(achievement.title). \(achievement.achievementDesc)")
             }
             // Floating test button (bottom right)
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    Button(action: {
-                        bannerAchievement = Achievement(
-                            title: "Test Streak!",
-                            achievementDesc: "Completed 7 days in a row.",
-                            type: .streak,
-                            requirement: 7,
-                            isUnlocked: true,
-                            unlockedAt: Date()
-                        )
-                        withAnimation { showAchievementBanner = true }
-                    }) {
-                        Image(systemName: "wand.and.stars")
-                            .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Circle().fill(Color.black))
-                    }
-                    .padding(.trailing, 24)
-                    .padding(.bottom, 32)
-                    .accessibilityLabel("Test Achievement Banner")
-                }
-            }
+            // VStack {
+            //     Spacer()
+            //     HStack {
+            //         Spacer()
+            //         Button(action: {
+            //             bannerAchievement = Achievement(
+            //                 title: "Test Streak!",
+            //                 achievementDesc: "Completed 7 days in a row.",
+            //                 type: .streak,
+            //                 requirement: 7,
+            //                 isUnlocked: true,
+            //                 unlockedAt: Date()
+            //             )
+            //             withAnimation { showAchievementBanner = true }
+            //         }) {
+            //             Image(systemName: "wand.and.stars")
+            //                 .font(.system(size: 28, weight: .bold))
+            //                 .foregroundColor(.white)
+            //                 .padding()
+            //                 .background(Circle().fill(Color.black))
+            //         }
+            //         .padding(.trailing, 24)
+            //         .padding(.bottom, 32)
+            //         .accessibilityLabel("Test Achievement Banner")
+            //     }
+            // }
         }
         .onAppear {
             if activityMonitor == nil {
