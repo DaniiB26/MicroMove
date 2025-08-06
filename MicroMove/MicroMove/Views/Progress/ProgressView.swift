@@ -124,14 +124,14 @@ struct ProgressView: View {
                 }
                 .padding(.horizontal)
 
-                SimpleCalendarView(
-                    daysInMonth: daysInDisplayedMonth,
-                    activeDays: activeDaysInDisplayedMonth,
-                    onDaySelected: { day in
-                        selectedDay = day
-                    }
-                )
-                .padding(.horizontal)
+                // SimpleCalendarView(
+                //     daysInMonth: daysInDisplayedMonth,
+                //     activeDays: activeDaysInDisplayedMonth,
+                //     onDaySelected: { day in
+                //         selectedDay = day
+                //     }
+                // )
+                // .padding(.horizontal)
 
                 // Show all sessions for the selected day (future-proof for multiple sessions)
                 if let selectedDay = selectedDay {

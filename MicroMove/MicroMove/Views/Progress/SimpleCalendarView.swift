@@ -5,23 +5,53 @@ struct SimpleCalendarView: View {
     let activeDays: Set<Date>
     let onDaySelected: (Date) -> Void
 
+    @State private var selectedDate: Date? = nil
+
     var body: some View {
-        // Weekday headers
-        let weekdaySymbols = Calendar.current.shortWeekdaySymbols
-        VStack(spacing: 4) {
-            // Calendar grid
+        let calendar = Calendar.current
+        let weekdaySymbols = calendar.shortWeekdaySymbols
+
+        VStack(spacing: 12) {
             LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7)) {
-                ForEach(daysInMonth, id: \.self) { day in
-                    Circle()
-                        .fill(activeDays.contains(day) ? Color.green : Color.gray.opacity(0.2))
-                        .frame(width: 32, height: 32)
-                        .overlay(Text("\(Calendar.current.component(.day, from: day))")
-                            .font(.caption)
-                            .foregroundColor(.primary))
+                ForEach(weekdaySymbols, id: \.self) { symbol in
+                    Text(symbol.uppercased())
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+
+            // Days grid
+            LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7), spacing: 10) {
+                ForEach(Array(daysInMonth.enumerated()), id: \.offset) { _, day in
+                    if day == Date.distantPast {
+                        Color.clear.frame(height: 32)
+                    } else {
+                        let isActive = activeDays.contains(calendar.startOfDay(for: day))
+                        let isSelected = selectedDate.map { calendar.isDate($0, inSameDayAs: day) } ?? false
+                        let dayNumber = calendar.component(.day, from: day)
+
+                        ZStack {
+                            if isActive {
+                                Circle()
+                                    .fill(Color.green)
+                                    .frame(width: 34, height: 34)
+                            } else if isSelected {
+                                Circle()
+                                    .stroke(Color.pink, lineWidth: 2)
+                                    .frame(width: 34, height: 34)
+                            }
+
+                            Text("\(dayNumber)")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundColor(isActive ? .white : .primary)
+                        }
+                        .frame(height: 40)
                         .onTapGesture {
+                            selectedDate = day
                             onDaySelected(day)
                         }
-                        .accessibilityLabel("Day \(Calendar.current.component(.day, from: day)) \(activeDays.contains(day) ? ", active" : ", inactive")")
+                    }
                 }
             }
         }
