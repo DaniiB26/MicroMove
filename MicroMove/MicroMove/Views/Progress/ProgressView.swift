@@ -8,7 +8,7 @@ struct ProgressView: View {
     private var daysInDisplayedMonth: [Date] {
         let calendar = Calendar.current
         guard let range = calendar.range(of: .day, in: .month, for: displayedMonth),
-                let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth)) else {
+              let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: displayedMonth)) else {
             return []
         }
         return range.compactMap { day -> Date? in
@@ -21,12 +21,10 @@ struct ProgressView: View {
         return activeDays.filter { calendar.isDate($0, equalTo: displayedMonth, toGranularity: .month) }
     }
 
-    // Returns a set of days with at least one workout session
     private var activeDays: Set<Date> {
         viewModel.activeDays
     }
 
-    // Returns a formatted label for the current month
     private func monthLabel(for date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "LLLL yyyy"
@@ -36,42 +34,10 @@ struct ProgressView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                // Weekly and monthly stats in cards
+                // Weekly and monthly stats
                 HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("This Week")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        let weekStats = viewModel.weeklyStats()
-                        Text("\(weekStats.exercises)")
-                            .font(.title2).bold()
-                            .foregroundColor(.accentColor)
-                        Text("Exercises")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        Text("\(weekStats.duration) min")
-                            .font(.subheadline)
-                            .foregroundColor(.primary)
-                    }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("This Month")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        let monthStats = viewModel.monthlyStats()
-                        Text("\(monthStats.exercises)")
-                            .font(.title2).bold()
-                            .foregroundColor(.accentColor)
-                        Text("Exercises")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        Text("\(monthStats.duration) min")
-                            .font(.subheadline)
-                            .foregroundColor(.primary)
-                    }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
+                    statCard(title: "This Week", stats: viewModel.weeklyStats(), accent: .accentColor)
+                    statCard(title: "This Month", stats: viewModel.monthlyStats(), accent: .accentColor)
                 }
                 .padding(.horizontal)
 
@@ -79,29 +45,14 @@ struct ProgressView: View {
 
                 // Streaks
                 HStack(spacing: 24) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Current Streak")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("\(viewModel.currentStreak) day\(viewModel.currentStreak == 1 ? "" : "s")")
-                            .font(.title3).bold()
-                            .foregroundColor(.green)
-                    }
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Longest Streak")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        Text("\(viewModel.longestStreak) day\(viewModel.longestStreak == 1 ? "" : "s")")
-                            .font(.title3).bold()
-                            .foregroundColor(.blue)
-                    }
+                    streakView(title: "Current Streak", value: viewModel.currentStreak, color: .green)
+                    streakView(title: "Longest Streak", value: viewModel.longestStreak, color: .blue)
                 }
                 .padding(.horizontal)
 
                 Divider()
 
-                // Month label and calendar
-
+                // Month navigation
                 HStack {
                     Button(action: {
                         if let prevMonth = Calendar.current.date(byAdding: .month, value: -1, to: displayedMonth) {
@@ -124,51 +75,9 @@ struct ProgressView: View {
                 }
                 .padding(.horizontal)
 
-                // SimpleCalendarView(
-                //     daysInMonth: daysInDisplayedMonth,
-                //     activeDays: activeDaysInDisplayedMonth,
-                //     onDaySelected: { day in
-                //         selectedDay = day
-                //     }
-                // )
-                // .padding(.horizontal)
-
-                // Show all sessions for the selected day (future-proof for multiple sessions)
+                // Calendar + session details
                 if let selectedDay = selectedDay {
-                    let sessions = viewModel.sessions(for: selectedDay)
-                    if !sessions.isEmpty {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text("Workout Details for \(selectedDay, style: .date)")
-                                .font(.headline)
-                                .padding(.top)
-                            ForEach(sessions, id: \ .id) { session in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("Exercises: \(session.exercises.map { $0.name }.joined(separator: ", "))")
-                                        .font(.subheadline)
-                                    Text("Duration: \(session.duration) min")
-                                        .font(.subheadline)
-                                    if let startedAt = session.startedAt {
-                                        Text("Started: \(startedAt, style: .time)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                    if let completedAt = session.completedAt {
-                                        Text("Completed: \(completedAt, style: .time)")
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray5)))
-                                .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
-                            }
-                        }
-                        .padding(.horizontal)
-                    } else {
-                        Text("No workout session for this day.")
-                            .italic()
-                            .padding()
-                    }
+                    sessionDetailsView(for: selectedDay)
                 }
             }
             .padding(.vertical)
@@ -176,6 +85,77 @@ struct ProgressView: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onAppear {
             viewModel.refreshProgress()
+        }
+    }
+
+    // MARK: - Subviews
+
+    private func statCard(title: String, stats: (exercises: Int, duration: Int), accent: Color) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("\(stats.exercises)")
+                .font(.title2).bold()
+                .foregroundColor(accent)
+            Text("Exercises")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+            Text("\(stats.duration) min")
+                .font(.subheadline)
+                .foregroundColor(.primary)
+        }
+        .padding()
+        .background(RoundedRectangle(cornerRadius: 12).fill(Color(.systemGray6)))
+    }
+
+    private func streakView(title: String, value: Int, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(title)
+                .font(.caption)
+                .foregroundColor(.secondary)
+            Text("\(value) day\(value == 1 ? "" : "s")")
+                .font(.title3).bold()
+                .foregroundColor(color)
+        }
+    }
+
+    @ViewBuilder
+    private func sessionDetailsView(for day: Date) -> some View {
+        let sessions = viewModel.sessions(for: day)
+
+        if !sessions.isEmpty {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Workout Details for \(day, style: .date)")
+                    .font(.headline)
+                    .padding(.top)
+                ForEach(sessions, id: \.id) { session in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Exercises: \(session.exercises.map { $0.baseExercise.name }.joined(separator: ", "))")
+                            .font(.subheadline)
+                        Text("Duration: \(session.duration) min")
+                            .font(.subheadline)
+                        if let startedAt = session.startedAt {
+                            Text("Started: \(startedAt, style: .time)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        if let completedAt = session.completedAt {
+                            Text("Completed: \(completedAt, style: .time)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding()
+                    .background(RoundedRectangle(cornerRadius: 10).fill(Color(.systemGray5)))
+                    .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
+                }
+            }
+            .padding(.horizontal)
+        } else {
+            Text("No workout session for this day.")
+                .italic()
+                .padding()
         }
     }
 }
