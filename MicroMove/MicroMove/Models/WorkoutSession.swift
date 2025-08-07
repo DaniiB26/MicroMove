@@ -1,6 +1,5 @@
 import Foundation
 import SwiftData
-
 /// Represents a workout session containing multiple exercises.
 @Model
 final class WorkoutSession {
@@ -11,7 +10,7 @@ final class WorkoutSession {
     /// Total duration of the session in minutes.
     var duration: Int
     /// List of exercises performed in this session.
-    var exercises: [Exercise]
+    var exercises: [ExerciseDTO]
     /// Timestamp when the session started.
     var startedAt: Date?
     /// Timestamp when the session was completed.
@@ -22,7 +21,7 @@ final class WorkoutSession {
         id: UUID = UUID(),
         date: Date = Date(),
         duration: Int = 0,
-        exercises: [Exercise] = [],
+        exercises: [ExerciseDTO] = [],
         startedAt: Date? = nil,
         completedAt: Date? = nil
     ) {

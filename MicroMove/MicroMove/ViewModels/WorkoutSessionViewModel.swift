@@ -67,7 +67,8 @@ class WorkoutSessionViewModel: ObservableObject {
 
         let now = Date()
         if let session = todaySession {
-            session.exercises.append(exercise)
+            let dto = ExerciseDTO(baseExercise: exercise, startedAt: now, completedAt: now + TimeInterval(exercise.duration * 60))
+            session.exercises.append(dto)
             session.duration += exercise.duration
             if session.startedAt == nil {
                 session.startedAt = now
@@ -76,33 +77,34 @@ class WorkoutSessionViewModel: ObservableObject {
             updateWorkoutSession(session)
             do {
                 try modelContext.save()
-                print("[WorkoutSessionViewModel] Updated today's session:")
-                print("  Date: \(session.date)")
-                print("  Exercises: \(session.exercises.map { $0.name }) (\(session.exercises.count) total)")
-                print("  Duration: \(session.duration) min")
-                print("  StartedAt: \(String(describing: session.startedAt))")
-                print("  CompletedAt: \(String(describing: session.completedAt))")
+                // print("[WorkoutSessionViewModel] Updated today's session:")
+                // print("  Date: \(session.date)")
+                // print("  Exercises: \(session.exercises.map { $0.name }) (\(session.exercises.count) total)")
+                // print("  Duration: \(session.duration) min")
+                // print("  StartedAt: \(String(describing: session.startedAt))")
+                // print("  CompletedAt: \(String(describing: session.completedAt))")
             } catch {
                 print("[WorkoutSessionViewModel] Error saving updated session: \(error)")
             }
         } else {
             let completedAt = now + TimeInterval(exercise.duration * 60)
+            let dto = ExerciseDTO(baseExercise: exercise, startedAt: now, completedAt: now + TimeInterval(exercise.duration * 60))
             let newSession = WorkoutSession(
                 date: today,
                 duration: exercise.duration,
-                exercises: [exercise],
+                exercises: [dto],
                 startedAt: now,
                 completedAt: completedAt
             )
             addWorkoutSession(newSession)
             do {
                 try modelContext.save()
-                print("[WorkoutSessionViewModel] Created new session for today:")
-                print("  Date: \(newSession.date)")
-                print("  Exercises: \(newSession.exercises.map { $0.name }) (1 total)")
-                print("  Duration: \(newSession.duration) min")
-                print("  StartedAt: \(String(describing: newSession.startedAt))")
-                print("  CompletedAt: \(String(describing: newSession.completedAt))")
+                // print("[WorkoutSessionViewModel] Created new session for today:")
+                // print("  Date: \(newSession.date)")
+                // print("  Exercises: \(newSession.exercises.map { $0.name }) (1 total)")
+                // print("  Duration: \(newSession.duration) min")
+                // print("  StartedAt: \(String(describing: newSession.startedAt))")
+                // print("  CompletedAt: \(String(describing: newSession.completedAt))")
             } catch {
                 print("[WorkoutSessionViewModel] Error saving new session: \(error)")
             }
