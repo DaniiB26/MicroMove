@@ -12,131 +12,151 @@ struct ExerciseDetailView: View {
     var activityMonitor: ActivityMonitor? = nil
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                
-                // Main Info Card
-                HStack {
-                    Spacer()
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text(exercise.name)
-                            .font(.largeTitle).bold()
-                            .foregroundColor(.accentColor)
-            Text(exercise.exerciseDesc)
-                .font(.body)
-                            .foregroundColor(.primary)
-                        HStack(spacing: 16) {
-                            Label("\(exercise.type.rawValue.capitalized)", systemImage: "bolt.heart")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Label("\(exercise.bodyPart.rawValue.capitalized)", systemImage: "figure.strengthtraining.traditional")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Label("\(exercise.duration) min", systemImage: "timer")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
+        ZStack {
+            Color(.systemGray6).ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    // Hero Header
+                    ZStack(alignment: .bottom) {
+                        headerImage
+                            .resizable()
+                            .scaledToFill()
+                            .clipped()
+                            .overlay(
+                                LinearGradient(
+                                    colors: [.clear, .black.opacity(0.5)],
+                                    startPoint: .center,
+                                    endPoint: .top
+                                )
+                            )
+                        
+                        VStack {
+                            // Play Button
+                            Button {
+                                // TODO: open video / visual guide
+                            } label: {
+                                Label("Play video", systemImage: "play.fill")
+                                    .font(.subheadline.weight(.semibold))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
+                                    .background(.black)
+                                    .clipShape(Capsule())
+                            }
+                            .foregroundColor(.white)
+                            .padding(.bottom, 14)
+
+                            HStack(spacing: 20) {
+                                chip(text: exercise.type.rawValue.capitalized)
+                                Spacer()
+                                chip(text: exercise.bodyPart.rawValue.capitalized)
+                                Spacer()
+                                chip(text: "\(exercise.duration) min")
+                            }
                         }
                     }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 18).fill(Color(.systemBackground)).shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2))
-            Spacer()
-                }
-
-                // Completion Status Indicator
-                HStack(spacing: 8) {
-                    if exercise.isCompleted {
-                        Image(systemName: "checkmark.seal.fill")
-                            .foregroundColor(.green)
-                        Text("Completed")
-                            .foregroundColor(.green)
-                            .font(.headline)
-                    } else {
-                        Image(systemName: "circle")
-                            .foregroundColor(.gray)
-                        Text("Not Completed")
-                            .foregroundColor(.gray)
-                            .font(.headline)
-                    }
-                }
-                .padding(.bottom, 4)
-                
-                if !exercise.visualGuide.isEmpty {
-                    VStack(alignment: .center, spacing: 8) {
-                        Text("Exercise Guide")
+                    
+                    // Instructions
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("\(exercise.name) instructions")
                             .font(.title3).bold()
-                            .foregroundColor(.accentColor)
-                        Image(exercise.visualGuide[currentGuideIndex])
-                            .resizable()
-                .aspectRatio(contentMode: .fit)
-                .cornerRadius(16)
-                .shadow(radius: 8)
-                            .onTapGesture {
-                                // Advance to next image, loop back to start
-                                currentGuideIndex = (currentGuideIndex + 1) % exercise.visualGuide.count
-                            }
-                        Text("Step \(currentGuideIndex + 1) of \(exercise.visualGuide.count)")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-
-                if !exercise.instructions.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Instructions")
-                            .font(.title3).bold()
-                            .foregroundColor(.accentColor)
+                            .foregroundColor(.primary)
+                        
                         VStack(alignment: .leading, spacing: 12) {
-                            ForEach(Array(exercise.instructions.enumerated()), id: \.offset) { index, step in
-                                HStack(alignment: .top, spacing: 8) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(Color.accentColor.opacity(0.15))
-                                            .frame(width: 32, height: 32)
-                                        Text("\(index + 1)")
-                                            .font(.headline)
-                                            .foregroundColor(.accentColor)
-                                    }
+                            ForEach(Array(exercise.instructions.enumerated()), id: \.offset) { idx, step in
+                                HStack(alignment: .top, spacing: 10) {
+                                    Text("\(idx + 1).")
+                                        .font(.body.weight(.semibold))
                                     Text(step)
                                         .font(.body)
-                                        .foregroundColor(.primary)
                                 }
                             }
                         }
+                        .padding(.horizontal, 20)
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 16)
                 }
-                Divider().padding(.vertical, 8)
-
-                Button (action: {
-                    exerciseViewModel.markExerciseAsDone(exercise)
-                }) {
-                    Label("Mark as Done", systemImage: "checkmark.circle")
-                        .font(.headline)
-                .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.accentColor.opacity(0.15))
-                        .cornerRadius(10)
-                }
-                .accessibilityLabel("Mark as Done")
-
-            Button(action: {
-                activityLogViewModel.addExerciseStart(exercise: exercise)
-                showTimer = true
-            }) {
-                Label("Start Exercise", systemImage: "play.circle")
-                    .font(.headline)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                        .background(Color.accentColor.opacity(0.15))
-                        .cornerRadius(10)
             }
-            .accessibilityLabel("Start Exercise")
+            .edgesIgnoringSafeArea(.top)
         }
-        .padding()
+        .navigationTitle(exercise.name)
+        .navigationBarTitleDisplayMode(.inline)
+        
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: 12) {
+                Button {
+                    activityLogViewModel.addExerciseStart(exercise: exercise)
+                    showTimer = true
+                } label: {
+                    Text("Start")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(PrimaryFilledButton())
+
+                Button {
+                    exerciseViewModel.markExerciseAsDone(exercise)
+                } label: {
+                    Text("Mark as done")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(SecondarySoftButton())
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .background(.white)
         }
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationDestination(isPresented: $showTimer) {
-            TimerView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, activityMonitor: activityMonitor, exerciseViewModel: exerciseViewModel, progressViewModel: progressViewModel)
+            TimerView(
+                exercise: exercise,
+                activityLogViewModel: activityLogViewModel,
+                workoutSessionViewModel: workoutSessionViewModel,
+                activityMonitor: activityMonitor,
+                exerciseViewModel: exerciseViewModel,
+                progressViewModel: progressViewModel
+            )
         }
+    }
+    private var headerImage: Image {
+        if !exercise.image.isEmpty {
+            return Image(exercise.image)         
+        }
+        if let first = exercise.visualGuide.first, !first.isEmpty {
+            return Image(first)
+        }
+        return Image(systemName: "figure.strengthtraining.traditional")
+    }
+
+    private func chip(text: String) -> some View {
+        Text(text)
+            .font(.subheadline.weight(.semibold))
+            .foregroundColor(.white)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 24)
+            .clipShape(Capsule())
+    }
+}
+
+struct PrimaryFilledButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .padding(.vertical, 14)
+            .background(Color.black)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .opacity(configuration.isPressed ? 0.85 : 1)
+    }
+}
+
+struct SecondarySoftButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.headline)
+            .padding(.vertical, 14)
+            .background(Color(.systemGray5))
+            .foregroundColor(.black)
+            .clipShape(RoundedRectangle(cornerRadius: 14))
+            .opacity(configuration.isPressed ? 0.9 : 1)
     }
 }

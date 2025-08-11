@@ -9,16 +9,23 @@ struct ExerciseListView: View {
     @ObservedObject var progressViewModel: ProgressViewModel
     var activityMonitor: ActivityMonitor? = nil
 
+    private var filteredExercises: [Exercise] {
+        exerciseViewModel.filteredAndSortedExercises
+    }
+
     var body: some View {
         NavigationStack {
-            HStack {
-                Text("Exercises")
-                    .font(.title2)
-                    .bold()
-                    .padding(.leading)
-                Spacer()
-            }
-            VStack {
+            VStack(spacing: 16) {
+                //TITLE
+                HStack {
+                    Text("RECENT WORKOUTS")
+                        .font(.custom("DotGothic16", size: 36))
+                        .foregroundColor(.black)
+                        .padding()
+                    Spacer()
+                }
+                
+                //SORTER
                 HStack {
                     Spacer()
                     Button(action: {
@@ -35,20 +42,36 @@ struct ExerciseListView: View {
                     .accessibilityLabel(exerciseViewModel.isDurationAscending ? "Sort ascending by duration" : "Sort descending by duration")
                 }
                 
-                Picker("Select Exercise Type", selection: $exerciseViewModel.selectedType) {
-                    Text("All").tag(nil as ExerciseType?)
-                    ForEach(ExerciseType.allCases, id: \.self) { type in
-                        Text(type.rawValue.capitalized).tag(type as ExerciseType?)
+                // List(exerciseViewModel.filteredAndSortedExercises, id: \.id) { exercise in
+                //     NavigationLink(destination: ExerciseDetailView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, exerciseViewModel: exerciseViewModel, progressViewModel: progressViewModel, activityMonitor: activityMonitor)) {
+                //         ExerciseRowView(exercise: exercise)
+                //     }
+                // }
+
+                //EXERCISE CARDS
+                ScrollView{
+                    VStack(spacing: 16) {
+                        ForEach(filteredExercises, id: \.id) {exercise in
+                            NavigationLink(destination: ExerciseDetailView(
+                                exercise: exercise,
+                                activityLogViewModel: activityLogViewModel,
+                                workoutSessionViewModel: workoutSessionViewModel,
+                                exerciseViewModel: exerciseViewModel,
+                                progressViewModel: progressViewModel,
+                                activityMonitor: activityMonitor)
+                            ) {
+                                ExerciseCardView(exercise: exercise)
+                                    .padding(.horizontal)
+                            }
+                        }
                     }
+                    .padding(.top)
                 }
-                .pickerStyle(.segmented)
-                .padding(.horizontal)
-                
-                List(exerciseViewModel.filteredAndSortedExercises, id: \.id) { exercise in
-                    NavigationLink(destination: ExerciseDetailView(exercise: exercise, activityLogViewModel: activityLogViewModel, workoutSessionViewModel: workoutSessionViewModel, exerciseViewModel: exerciseViewModel, progressViewModel: progressViewModel, activityMonitor: activityMonitor)) {
-                        ExerciseRowView(exercise: exercise)
-                    }
-                }
+
+                //FILTER PICKER
+                CustomPicker(selectedType: $exerciseViewModel.selectedType)
+
+                Spacer()
 
                 // Button("Add Exercise") {
                 //     let newExercise = Exercise(
@@ -80,9 +103,8 @@ struct ExerciseListView: View {
                 // Button("Delete All Exercises") {
                 //     exerciseViewModel.deleteAllExercises(modelContext: modelContext)
                 // }
-
-                .navigationTitle("Main Menu")
             }
         }
+        .background(Color(.systemGray6))
     }
 }
