@@ -9,6 +9,7 @@ struct ExerciseDetailView: View {
     @ObservedObject var progressViewModel: ProgressViewModel
     @State private var showTimer = false
     @State private var currentGuideIndex = 0
+    @State private var showGuide = false
     var activityMonitor: ActivityMonitor? = nil
 
     var body: some View {
@@ -34,7 +35,7 @@ struct ExerciseDetailView: View {
                         VStack {
                             // Play Button
                             Button {
-                                // TODO: open video / visual guide
+                                showGuide = true
                             } label: {
                                 Label("Play video", systemImage: "play.fill")
                                     .font(.subheadline.weight(.semibold))
@@ -82,6 +83,13 @@ struct ExerciseDetailView: View {
         }
         .navigationTitle(exercise.name)
         .navigationBarTitleDisplayMode(.inline)
+
+        .fullScreenCover(isPresented: $showGuide) {
+            ExerciseGuideSheet(
+                images: exercise.visualGuide,
+                startIndex: currentGuideIndex
+            )
+        }
         
         .safeAreaInset(edge: .bottom) {
             HStack(spacing: 12) {
@@ -95,12 +103,15 @@ struct ExerciseDetailView: View {
                 .buttonStyle(PrimaryFilledButton())
 
                 Button {
-                    exerciseViewModel.markExerciseAsDone(exercise)
+                    if !exercise.isCompleted {
+                        exerciseViewModel.markExerciseAsDone(exercise)
+                    }
                 } label: {
-                    Text("Mark as done")
+                    Text(exercise.isCompleted ? "Already Completed" : "Mark as Done")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(SecondarySoftButton())
+                .disabled(exercise.isCompleted)
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
