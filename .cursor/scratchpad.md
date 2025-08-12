@@ -1,5 +1,6 @@
 ## Background and Motivation
 MicroMove is an iOS app that promotes "exercise snacking" - the concept of incorporating short, frequent movements into daily routines. The app aims to make fitness more accessible by breaking down exercise into manageable micro-workouts that can be done anywhere, anytime. This approach helps users build sustainable healthy habits without the pressure of long workout sessions.
+MicroMove encourages users to incorporate short bursts of exercise into their daily lives. By adding user personalization (profiles, goals), intelligent scheduling (routines and triggers), adaptive feedback, and richer analytics, the app becomes a more effective habit-forming tool while maintaining its offline, privacy-first philosophy.
 
 ## Key Challenges and Analysis
 1. **Background Activity Management**
@@ -21,6 +22,28 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
    - Smart timing algorithms
    - User preference management
    - Do Not Disturb integration
+
+## Key Challenges and Analysis
+1. **Personalization**
+   - Designing a local user profile system that influences recommendations
+   - Mapping profile attributes (e.g., fitness level) to suggestion logic
+
+2. **Routine & Trigger System**
+   - Managing multiple trigger types in one routine
+   - Handling background execution limits for different triggers (e.g., inactivity, device state)
+
+3. **Adaptive Feedback**
+   - Creating a rating system that meaningfully influences future suggestions
+   - Balancing between user control and automation
+
+4. **Data & Privacy**
+   - Storing all data locally with SwiftData
+   - Explicit permission requests for HealthKit/motion data
+
+5. **Analytics & Motivation**
+   - Designing visual summaries that encourage long-term engagement
+   - Implementing habit formation tracking without excessive complexity
+
 
 ## High-Level Task Breakdown
 
@@ -141,6 +164,85 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
     - Loading state patterns
 
 
+### Phase 5: Personalization
+- [ ] **Task 9: User Profile System**
+  - ✅ Success Criteria:
+    - User can set/edit name, fitness level, and fitness goals
+    - Profile data persists locally
+    - Profile influences exercise suggestions and reminders
+  - 🎯 Learning Goal:
+    - Local data persistence patterns
+    - Binding data to UI for live updates
+  - 📘 Educator Notes:
+    - SwiftData entity relationships
+    - Using `@AppStorage` vs SwiftData for user settings
+    - MVVM binding with SwiftUI forms
+
+### Phase 6: Routine Builder
+- [ ] **Task 10: Exercise Inventory & Routine Creation**
+  - ✅ Success Criteria:
+    - User can select exercises to add to a personal routine
+    - Multiple trigger types can be assigned
+    - Routines can be activated/deactivated/deleted
+  - 🎯 Learning Goal:
+    - Complex model design (Routine with multiple triggers)
+    - Building multi-step forms in SwiftUI
+  - 📘 Educator Notes:
+    - One-to-many and many-to-many relationships in SwiftData
+    - SwiftUI navigation flows for creation wizards
+
+- [ ] **Task 11: Trigger Engine Implementation**
+  - ✅ Success Criteria:
+    - Supports recurring time-based, inactivity, HealthKit, device state, and home automation triggers
+    - Executes routines based on trigger events
+  - 🎯 Learning Goal:
+    - Background processing strategies
+    - Integration with HealthKit and motion APIs
+  - 📘 Educator Notes:
+    - `UNUserNotificationCenter` for scheduled triggers
+    - HealthKit integration basics
+    - Handling background task expiration
+
+### Phase 7: Social & Motivation
+- [ ] **Task 12: Achievements Sharing**
+  - ✅ Success Criteria:
+    - Achievements can be shared via iOS share sheet
+    - Share includes title, badge, and context
+  - 🎯 Learning Goal:
+    - Share sheet integration
+    - Dynamic image/text composition
+  - 📘 Educator Notes:
+    - `UIActivityViewController` usage
+    - Rendering SwiftUI views as images
+
+### Phase 8: Adaptive Feedback
+- [ ] **Task 13: Exercise Rating & Adaptation**
+  - ✅ Success Criteria:
+    - User can rate completed exercises
+    - Weekly check-in prompts to adjust goals
+    - Suggestion algorithm adapts to ratings
+  - 🎯 Learning Goal:
+    - Collecting and storing feedback data
+    - Building adaptive recommendation logic
+  - 📘 Educator Notes:
+    - Decision-making algorithms
+    - Using SwiftData fetch requests with predicates for filtering suggestions
+
+### Phase 9: Advanced Analytics
+- [ ] **Task 14: Progress & Habit Formation Tracking**
+  - ✅ Success Criteria:
+    - Daily/weekly summaries with visual history
+    - Habit streak calculations (e.g., 3x/week for 4 weeks)
+    - Motivational feedback based on progress
+  - 🎯 Learning Goal:
+    - Advanced date handling and grouping
+    - Data visualization patterns in SwiftUI
+  - 📘 Educator Notes:
+    - Swift Charts advanced customization
+    - DateComponents and Calendar math
+
+
+
 ## Project Status Board
 - [X] Task 1: Project Setup and Basic Architecture
 - [X] Task 2: Exercise Data Model and Storage
@@ -150,6 +252,12 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
 - [X] Task 6: Achievement System
 - [ ] Task 7: Testing and Optimization
 - [ ] Task 8: UI Polish and Animations
+- [ ] Task 9: User Profile System
+- [ ] Task 10: Exercise Inventory & Routine Creation
+- [ ] Task 11: Trigger Engine Implementation
+- [ ] Task 12: Achievements Sharing
+- [ ] Task 13: Exercise Rating & Adaptation
+- [ ] Task 14: Progress & Habit Formation Tracking
 
 ---
 
@@ -204,4 +312,3 @@ MicroMove is an iOS app that promotes "exercise snacking" - the concept of incor
   - Documenting achievement logic helps future expansion
 
 ---
-
