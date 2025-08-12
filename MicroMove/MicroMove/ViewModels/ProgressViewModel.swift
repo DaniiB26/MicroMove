@@ -148,4 +148,32 @@ class ProgressViewModel: ObservableObject {
             }
         }
     }
+
+    func recentExercises(limit: Int = 5, uniqueByExercise: Bool = true) -> [Exercise] {
+        var items: [(exercise: Exercise, key: Date)] = []
+
+        for session in workoutSessions {
+            for dto in session.exercises {
+                let key = dto.completedAt ?? dto.startedAt ?? session.date
+                items.append((dto.baseExercise, key))
+            }
+        }
+
+        let sorted = items.sorted { $0.key > $1.key }.map { $0.exercise }
+
+        if uniqueByExercise {
+            var seen: Set<UUID> = []
+            var unique: [Exercise] = []
+            for ex in sorted {
+                if !seen.contains(ex.id) {
+                    seen.insert(ex.id)
+                    unique.append(ex)
+                    if unique.count == limit { break }
+                }
+            }
+            return unique
+        } else {
+            return Array(sorted.prefix(limit))
+        }
+    }
 }

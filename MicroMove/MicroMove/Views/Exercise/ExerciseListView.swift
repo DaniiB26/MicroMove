@@ -13,6 +13,14 @@ struct ExerciseListView: View {
         exerciseViewModel.filteredAndSortedExercises
     }
 
+    private var displayedExercises: [Exercise] {
+        if exerciseViewModel.selectedType == nil {
+            return progressViewModel.recentExercises(limit: 20, uniqueByExercise: true)
+        } else {
+            return exerciseViewModel.filteredAndSortedExercises
+        }
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
@@ -49,19 +57,30 @@ struct ExerciseListView: View {
                 // }
 
                 //EXERCISE CARDS
-                ScrollView{
+                ScrollView {
                     VStack(spacing: 16) {
-                        ForEach(filteredExercises, id: \.id) {exercise in
-                            NavigationLink(destination: ExerciseDetailView(
-                                exercise: exercise,
-                                activityLogViewModel: activityLogViewModel,
-                                workoutSessionViewModel: workoutSessionViewModel,
-                                exerciseViewModel: exerciseViewModel,
-                                progressViewModel: progressViewModel,
-                                activityMonitor: activityMonitor)
-                            ) {
-                                ExerciseCardView(exercise: exercise)
-                                    .padding(.horizontal)
+                        if displayedExercises.isEmpty {
+                            Text(exerciseViewModel.selectedType == nil
+                                 ? "No recent workouts yet."
+                                 : "No exercises for this filter.")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        } else {
+                            ForEach(displayedExercises, id: \.id) { exercise in
+                                NavigationLink(
+                                    destination: ExerciseDetailView(
+                                        exercise: exercise,
+                                        activityLogViewModel: activityLogViewModel,
+                                        workoutSessionViewModel: workoutSessionViewModel,
+                                        exerciseViewModel: exerciseViewModel,
+                                        progressViewModel: progressViewModel,
+                                        activityMonitor: activityMonitor
+                                    )
+                                ) {
+                                    ExerciseCardView(exercise: exercise)
+                                        .padding(.horizontal)
+                                }
                             }
                         }
                     }
