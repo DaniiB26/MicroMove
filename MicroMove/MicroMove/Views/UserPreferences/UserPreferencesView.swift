@@ -6,6 +6,19 @@ struct UserPreferencesView: View {
 
     var body: some View {
         Form{
+            Section(header: Text("User Details")) {
+                if isEditing {
+                    TextField("Enter Your Name", text: $viewModel.userName)
+                }
+                else {
+                    HStack {
+                        Text("User Name")
+                        Spacer()
+                        Text("\(viewModel.userName)")
+                    }
+                }
+            }
+
             Section(header: Text("Reminders")) {
                 if isEditing {
                     Stepper("Reminder Interval: \(viewModel.reminderInterval) min", value: $viewModel.reminderInterval)

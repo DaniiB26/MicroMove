@@ -9,6 +9,7 @@ class UserPreferencesViewModel: ObservableObject {
     @Published var reminderTime: Date = Date()
     @Published var quietHoursStart: Date = Date()
     @Published var quietHoursEnd: Date = Date()
+    @Published var userName: String = ""
 
     /// The user's preferences, published for UI updates.
     @Published var userPreferences: UserPreferences?
@@ -29,6 +30,7 @@ class UserPreferencesViewModel: ObservableObject {
             if let prefs = try modelContext.fetch(descriptor).first {
                 userPreferences = prefs
                 reminderInterval = prefs.reminderInterval
+                userName = prefs.userName ?? ""
                 reminderTime = prefs.reminderTime
                 quietHoursStart = prefs.quietHoursStart
                 quietHoursEnd = prefs.quietHoursEnd
@@ -45,12 +47,14 @@ class UserPreferencesViewModel: ObservableObject {
     /// Saves the current values to the user's preferences in the data store.
     func savePreferences() {
         if let prefs = userPreferences {
+            prefs.userName = userName
             prefs.reminderInterval = reminderInterval
             prefs.reminderTime = reminderTime
             prefs.quietHoursStart = quietHoursStart
             prefs.quietHoursEnd = quietHoursEnd
         } else {
             let prefs = UserPreferences(
+                userName: userName,
                 reminderInterval: reminderInterval,
                 reminderTime: reminderTime,
                 quietHoursStart: quietHoursStart,
