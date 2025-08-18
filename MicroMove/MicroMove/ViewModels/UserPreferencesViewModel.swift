@@ -10,6 +10,8 @@ class UserPreferencesViewModel: ObservableObject {
     @Published var quietHoursStart: Date = Date()
     @Published var quietHoursEnd: Date = Date()
     @Published var userName: String = ""
+    @Published var fitnessLevel: FitnessLevel = .beginner
+    @Published var fitnessGoal: FitnessGoal = .strength
 
     /// The user's preferences, published for UI updates.
     @Published var userPreferences: UserPreferences?
@@ -31,6 +33,8 @@ class UserPreferencesViewModel: ObservableObject {
                 userPreferences = prefs
                 reminderInterval = prefs.reminderInterval
                 userName = prefs.userName ?? ""
+                fitnessLevel = prefs.fitnessLevel ?? .beginner
+                fitnessGoal = prefs.fitnessGoal  ?? .strength
                 reminderTime = prefs.reminderTime
                 quietHoursStart = prefs.quietHoursStart
                 quietHoursEnd = prefs.quietHoursEnd
@@ -48,6 +52,8 @@ class UserPreferencesViewModel: ObservableObject {
     func savePreferences() {
         if let prefs = userPreferences {
             prefs.userName = userName
+            prefs.fitnessLevel = fitnessLevel
+            prefs.fitnessGoal = fitnessGoal
             prefs.reminderInterval = reminderInterval
             prefs.reminderTime = reminderTime
             prefs.quietHoursStart = quietHoursStart
@@ -55,6 +61,8 @@ class UserPreferencesViewModel: ObservableObject {
         } else {
             let prefs = UserPreferences(
                 userName: userName,
+                fitnessLevel: fitnessLevel,
+                fitnessGoal: fitnessGoal,
                 reminderInterval: reminderInterval,
                 reminderTime: reminderTime,
                 quietHoursStart: quietHoursStart,
