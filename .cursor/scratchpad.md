@@ -135,21 +135,7 @@ MicroMove encourages users to incorporate short bursts of exercise into their da
     - Achievement design
 
 ### Phase 4: Polish and Testing
-- [ ] Task 7: Testing and Optimization
-  - ✅ Success Criteria
-    - Unit tests for core logic
-    - UI tests for critical flows
-    - Performance optimization
-  - 🎯 Learning Goal
-    - Testing strategies
-    - Performance profiling
-    - Debug techniques
-  - 📘 Educator Notes
-    - XCTest framework
-    - Performance testing
-    - Debug tools
-
-- [ ] Task 8: UI Polish and Animations
+- [X] Task 7: UI Polish and Animations
   - ✅ Success Criteria
     - Smooth transitions
     - Loading states
@@ -163,9 +149,22 @@ MicroMove encourages users to incorporate short bursts of exercise into their da
     - Error handling best practices
     - Loading state patterns
 
+- [X] Task 8: Testing and Optimization
+  - ✅ Success Criteria
+    - Unit tests for core logic
+    - UI tests for critical flows
+    - Performance optimization
+  - 🎯 Learning Goal
+    - Testing strategies
+    - Performance profiling
+    - Debug techniques
+  - 📘 Educator Notes
+    - XCTest framework
+    - Performance testing
+    - Debug tools
 
 ### Phase 5: Personalization
-- [ ] **Task 9: User Profile System**
+- [X] **Task 9: User Profile System**
   - ✅ Success Criteria:
     - User can set/edit name, fitness level, and fitness goals
     - Profile data persists locally
@@ -250,8 +249,8 @@ MicroMove encourages users to incorporate short bursts of exercise into their da
 - [X] Task 4: Activity Detection System
 - [X] Task 5: Progress Tracking Implementation
 - [X] Task 6: Achievement System
-- [ ] Task 7: Testing and Optimization
-- [ ] Task 8: UI Polish and Animations
+- [X] Task 7: UI Polish and Animations
+- [ ] Task 8: Testing and Optimization
 - [ ] Task 9: User Profile System
 - [ ] Task 10: Exercise Inventory & Routine Creation
 - [ ] Task 11: Trigger Engine Implementation
