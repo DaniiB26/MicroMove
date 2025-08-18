@@ -52,18 +52,18 @@ struct AchievementListView: View {
             }
             .navigationTitle("Achievements")
             // Toolbar for demo achievement button
-            // .toolbar {
-            //     ToolbarItem(placement: .navigationBarTrailing) {
-            //         HStack {
-            //             Button("Add Demo Achievements") {
-            //                 addDemoAchievements()
-            //             }
-            //             Button("Delete All") {
-            //                 deleteAllAchievements()
-            //             }
-            //         }
-            //     }
-            // }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        Button("Add Demo Achievements") {
+                            addDemoAchievements()
+                        }
+                        Button("Delete All") {
+                            deleteAllAchievements()
+                        }
+                    }
+                }
+            }
             // Fetch achievements when view appears
             .onAppear {
                 viewModel.fetchAchievements()

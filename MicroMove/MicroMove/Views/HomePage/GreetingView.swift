@@ -30,7 +30,7 @@ struct GreetingView: View {
             HStack(spacing: 12) {
                 statCard(title: "This Week", value: "\(progressViewModel.weeklyStats().duration) min")
                 statCard(title: "This Month", value: "\(progressViewModel.monthlyStats().duration) min")
-                statCard(title: "Streak🔥", value: "\(progressViewModel.currentStreak) day\(progressViewModel.currentStreak == 1 ? "" : "s")")
+                statCard(title: "Streak", value: "\(progressViewModel.currentStreak) day\(progressViewModel.currentStreak == 1 ? "" : "s")")
             }
         }
         .padding(.horizontal)

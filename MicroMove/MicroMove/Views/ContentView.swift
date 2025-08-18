@@ -35,6 +35,7 @@ struct ContentView: View {
                 userPreferencesViewModel: userPreferencesViewModel,
                 activityLogViewModel: activityLogViewModel,
                 workoutSessionViewModel: workoutSessionViewModel,
+                achievementsViewModel: achievementsViewModel,
                 activityMonitor: activityMonitor
             )
 

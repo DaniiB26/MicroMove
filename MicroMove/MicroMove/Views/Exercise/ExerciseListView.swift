@@ -7,6 +7,7 @@ struct ExerciseListView: View {
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
+    @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
     var activityMonitor: ActivityMonitor? = nil
 
     private var filteredExercises: [Exercise] {
@@ -16,6 +17,10 @@ struct ExerciseListView: View {
     private var displayedExercises: [Exercise] {
         if exerciseViewModel.selectedType == nil {
             return progressViewModel.recentExercises(limit: 20, uniqueByExercise: true)
+            // let source = exerciseViewModel.exercises
+            // let prefs  = userPreferencesViewModel.userPreferences
+            // let recommended = (prefs != nil) ? exerciseViewModel.getRecommendedExercises(from: source, prefs: prefs!) : source
+            // return recommended
         } else {
             return exerciseViewModel.filteredAndSortedExercises
         }

@@ -7,6 +7,7 @@ struct BottomTabBar: View {
     @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
+    @ObservedObject var achievementsViewModel: AchievementsViewModel
     var activityMonitor: ActivityMonitor?
 
     var body: some View {
@@ -39,6 +40,7 @@ struct BottomTabBar: View {
                     activityLogViewModel: activityLogViewModel,
                     workoutSessionViewModel: workoutSessionViewModel,
                     progressViewModel: progressViewModel,
+                    userPreferencesViewModel: userPreferencesViewModel,
                     activityMonitor: activityMonitor
                 )
             }
@@ -48,9 +50,12 @@ struct BottomTabBar: View {
 
             // Achievements tab
             NavigationStack {
-                Text("Achievements View (To be implemented)")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemGray6))
+                // Text("Achievements View (To be implemented)")
+                //     .frame(maxWidth: .infinity, maxHeight: .infinity)
+                //     .background(Color(.systemGray6))
+                AchievementListView(
+                    viewModel: achievementsViewModel
+                )
             }
             .tabItem {
                 Label("Achievements", systemImage: "medal")

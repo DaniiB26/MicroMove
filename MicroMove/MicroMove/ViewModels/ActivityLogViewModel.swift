@@ -31,9 +31,9 @@ class ActivityLogViewModel: ObservableObject {
 
     /// Adds a new activity log to the data store and updates the list.
     func addActivityLog(_ activityLog: ActivityLog) {
-        modelContext.insert(activityLog)
-        activityLogs.append(activityLog)
-        print("[ActivityLogViewModel] Added activity log: \(activityLog.activityDesc)")
+        // modelContext.insert(activityLog)
+        // activityLogs.append(activityLog)
+        // print("[ActivityLogViewModel] Added activity log: \(activityLog.activityDesc)")
     }
 
     /// Saves changes to an existing activity log. Call after modifying an activity log's properties.
