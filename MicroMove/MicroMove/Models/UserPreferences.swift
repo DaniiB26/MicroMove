@@ -8,6 +8,10 @@ final class UserPreferences {
     let id: UUID
     /// User name for better UI
     var userName: String?
+    // Fitness Level
+    var fitnessLevel : FitnessLevel?
+    // Fitness Goal
+    var fitnessGoal : FitnessGoal?
     /// Interval between reminders, in minutes.
     var reminderInterval: Int
     /// Default time for reminders.
@@ -21,6 +25,8 @@ final class UserPreferences {
     init(
         id: UUID = UUID(),
         userName: String? = "",
+        fitnessLevel: FitnessLevel,
+        fitnessGoal: FitnessGoal,
         reminderInterval: Int = 60,
         reminderTime: Date = Date(),
         quietHoursStart: Date = Date(),
@@ -28,6 +34,8 @@ final class UserPreferences {
     ) {
         self.id = id
         self.userName = userName
+        self.fitnessLevel = fitnessLevel
+        self.fitnessGoal = fitnessGoal
         self.reminderInterval = reminderInterval
         self.reminderTime = reminderTime
         self.quietHoursStart = quietHoursStart

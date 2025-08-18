@@ -19,6 +19,33 @@ struct UserPreferencesView: View {
                 }
             }
 
+            Section(header: Text("Fitness")) {
+                if isEditing {
+                    Picker("Fitness Level", selection: $viewModel.fitnessLevel) {
+                        ForEach(FitnessLevel.allCases, id: \.self) { lvl in
+                            Text(lvl.display).tag(lvl)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+
+                    Picker("Primary Goal", selection: $viewModel.fitnessGoal) {
+                        ForEach(FitnessGoal.allCases, id: \.self) { g in
+                            Text(g.display).tag(g)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                } else {
+                    HStack {
+                        Text("Fitness Level"); Spacer()
+                        Text(viewModel.fitnessLevel.display)
+                    }
+                    HStack {
+                        Text("Goal"); Spacer()
+                        Text(viewModel.fitnessGoal.display)
+                    }
+                }
+            }
+
             Section(header: Text("Reminders")) {
                 if isEditing {
                     Stepper("Reminder Interval: \(viewModel.reminderInterval) min", value: $viewModel.reminderInterval)
