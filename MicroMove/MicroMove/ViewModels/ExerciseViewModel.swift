@@ -92,4 +92,35 @@ class ExercisesViewModel: ObservableObject {
         updateExercise(exercise)
         print("[ExercisesViewModel] Marked exercise as done: \(exercise.name)")
     }
+
+    func getRecommendedExercises(from all: [Exercise], prefs: UserPreferences) -> [Exercise] {
+
+        let wantedType: ExerciseType = {
+            switch prefs.fitnessGoal {
+                case .strength:    return .strength
+                case .cardio,
+                     .endurance,
+                     .weightLoss: return .cardio
+                case .mobility:    return .stretch
+                case .none:
+                    return .cardio
+                }
+            } ()
+
+        var list = all.filter { $0.type == wantedType}
+
+        switch prefs.fitnessLevel {
+            case .beginner:
+                list = list.filter { $0.duration <= 2 }
+            case .intermediate:
+//                list = list.filter { (3...4).contains($0.duration) }
+            list = list.filter { $0.duration >= 3 && $0.duration <= 4 }
+            case .advanced:
+                list = list.filter { $0.duration >= 5 }
+            case .none:
+                list
+        }
+        
+        return list.sorted { $0.duration < $1.duration }
+    }
 }
