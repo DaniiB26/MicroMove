@@ -84,50 +84,50 @@ struct ContentView: View {
                 //     }
                 // }
             //}
-            if showAchievementBanner, let achievement = bannerAchievement {
-                HStack(spacing: 12) {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.black)
-                        .font(.system(size: 28))
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Achievement Unlocked!")
-                            .font(.headline)
-                            .foregroundColor(.black)
-                        Text(achievement.title)
-                            .font(.subheadline)
-                            .foregroundColor(.black)
-                        Text(achievement.achievementDesc)
-                            .font(.caption)
-                            .foregroundColor(.black)
-                            .lineLimit(2)
-                    }
-                    Spacer()
-                }
-                .padding()
-                .background(
-                    Rectangle()
-                        .fill(Color.white)
-                        .cornerRadius(8)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.black, lineWidth: 2)
-                        )
-                )
-                .frame(
-                    width: UIScreen.main.bounds.width * 0.95,
-                    height: UIScreen.main.bounds.height * 0.13
-                )
-                .padding(.top, 16)
-                .transition(.move(edge: .top))
-                .onAppear {
-                    // Auto-dismiss after 3 seconds
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        withAnimation { showAchievementBanner = false }
-                    }
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Achievement Unlocked: \(achievement.title). \(achievement.achievementDesc)")
-            }
+            // if showAchievementBanner, let achievement = bannerAchievement {
+            //     HStack(spacing: 12) {
+            //         Image(systemName: "star.fill")
+            //             .foregroundColor(.black)
+            //             .font(.system(size: 28))
+            //         VStack(alignment: .leading, spacing: 2) {
+            //             Text("Achievement Unlocked!")
+            //                 .font(.headline)
+            //                 .foregroundColor(.black)
+            //             Text(achievement.title)
+            //                 .font(.subheadline)
+            //                 .foregroundColor(.black)
+            //             Text(achievement.achievementDesc)
+            //                 .font(.caption)
+            //                 .foregroundColor(.black)
+            //                 .lineLimit(2)
+            //         }
+            //         Spacer()
+            //     }
+            //     .padding()
+            //     .background(
+            //         Rectangle()
+            //             .fill(Color.white)
+            //             .cornerRadius(8)
+            //             .overlay(
+            //                 RoundedRectangle(cornerRadius: 8)
+            //                     .stroke(Color.black, lineWidth: 2)
+            //             )
+            //     )
+            //     .frame(
+            //         width: UIScreen.main.bounds.width * 0.95,
+            //         height: UIScreen.main.bounds.height * 0.13
+            //     )
+            //     .padding(.top, 16)
+            //     .transition(.move(edge: .top))
+            //     .onAppear {
+            //         // Auto-dismiss after 3 seconds
+            //         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            //             withAnimation { showAchievementBanner = false }
+            //         }
+            //     }
+            //     .accessibilityElement(children: .combine)
+            //     .accessibilityLabel("Achievement Unlocked: \(achievement.title). \(achievement.achievementDesc)")
+            // }
             // Floating test button (bottom right)
             // VStack {
             //     Spacer()
@@ -167,12 +167,12 @@ struct ContentView: View {
             }
             activityMonitor?.checkAndScheduleReminder()
         }
-        .onReceive(progressViewModel.$lastUnlockedAchievement) { achievement in
-            if let achievement = achievement {
-                bannerAchievement = achievement
-                withAnimation { showAchievementBanner = true }
-            }
-        }
+        // .onReceive(progressViewModel.$lastUnlockedAchievement) { achievement in
+        //     if let achievement = achievement {
+        //         bannerAchievement = achievement
+        //         withAnimation { showAchievementBanner = true }
+        //     }
+        // }
     }
 }
 

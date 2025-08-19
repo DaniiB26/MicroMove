@@ -50,12 +50,12 @@ struct BottomTabBar: View {
 
             // Achievements tab
             NavigationStack {
-                // Text("Achievements View (To be implemented)")
-                //     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                //     .background(Color(.systemGray6))
-                AchievementListView(
-                    viewModel: achievementsViewModel
-                )
+                Text("Achievements View (To be implemented)")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color(.systemGray6))
+                // AchievementListView(
+                //     viewModel: achievementsViewModel
+                // )
             }
             .tabItem {
                 Label("Achievements", systemImage: "medal")
