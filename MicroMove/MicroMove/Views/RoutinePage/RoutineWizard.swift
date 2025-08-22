@@ -5,25 +5,43 @@ struct RoutineWizard: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var name: String = ""
+    @State private var notes: String = ""
+    @State private var isActive = false
+    @FocusState private var nameFieldFocused: Bool
+
+    private var saveDisabled: Bool {
+        name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
     var body: some View {
-        VStack(spacing: 20) {
-            Text("New Routine")
-                .font(.title)
-
-            TextField("Routine name", text: $name)
-                .textFieldStyle(.roundedBorder)
-                .padding()
-
-            Button("Save Routine") {
-                let routine = Routine(name: name)
-                routineViewModel.addRoutine(routine)
-                dismiss()
+        Form {
+            Section {
+                TextField("Routine name", text: $name)
+                    .focused($nameFieldFocused)
+                TextField("Notes", text: $notes, axis: .vertical)
             }
-            .buttonStyle(.borderedProminent)
-
-            Spacer()
+            Section {
+                Toggle("Active", isOn: $isActive)
+            }
         }
-        .padding()
+        .navigationTitle("New Routine")
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button("Cancel") { dismiss() }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    let routine = Routine(
+                        name: name,
+                        notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes,
+                        isActive: isActive
+                    )
+                    routineViewModel.addRoutine(routine)
+                    dismiss()
+                }
+                .disabled(saveDisabled)
+            }
+        }
+        .onAppear { nameFieldFocused = true }
     }
 }
