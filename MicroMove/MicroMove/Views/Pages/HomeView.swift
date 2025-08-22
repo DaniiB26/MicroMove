@@ -3,6 +3,7 @@ import SwiftUI
 struct HomeView: View {
     @ObservedObject var progressViewModel: ProgressViewModel
     @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
+    @ObservedObject var routineViewModel: RoutineViewModel
 
     var body: some View {
         ZStack {
@@ -15,7 +16,7 @@ struct HomeView: View {
                         GreetingView(progressViewModel: progressViewModel, userPreferencesViewModel: userPreferencesViewModel)
                         CalendarView(progressViewModel: progressViewModel)
                         Spacer()
-                        StartWorkoutButton()
+                        StartWorkoutButton(destination: RoutineListView(routineViewModel: routineViewModel))
                         Spacer()
                     }
                     .padding(.top, 12)

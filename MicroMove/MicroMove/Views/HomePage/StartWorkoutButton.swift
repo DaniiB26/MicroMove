@@ -1,11 +1,13 @@
 import SwiftUI
 
-struct StartWorkoutButton: View {
+struct StartWorkoutButton<Destination: View>: View {
+    let destination: Destination
+
     var body: some View {
-        Button(action: {
-            print("Start new workout tapped")
-        }) {
-            Text("Start a new workout")
+        NavigationLink {
+            destination
+        } label: {
+            Text("Access Routines")
                 .font(.headline)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -13,5 +15,6 @@ struct StartWorkoutButton: View {
                 .background(Color.black)
                 .cornerRadius(16)
         }
+        .buttonStyle(.plain) // keeps your custom look
     }
 }

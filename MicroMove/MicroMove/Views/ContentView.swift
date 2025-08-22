@@ -12,6 +12,7 @@ struct ContentView: View {
     @StateObject private var workoutSessionViewModel: WorkoutSessionViewModel
     @StateObject private var achievementsViewModel: AchievementsViewModel
     @StateObject private var progressViewModel: ProgressViewModel
+    @StateObject private var routineViewModel: RoutineViewModel
     @State private var activityMonitor: ActivityMonitor? = nil
     @State private var showAchievementBanner = false
     @State private var bannerAchievement: Achievement?
@@ -24,6 +25,7 @@ struct ContentView: View {
         let achievementsVM = AchievementsViewModel(modelContext: modelContext)
         _achievementsViewModel = StateObject(wrappedValue: achievementsVM)
         _progressViewModel = StateObject(wrappedValue: ProgressViewModel(modelContext: modelContext, achievementsViewModel: achievementsVM))
+        _routineViewModel = StateObject(wrappedValue: RoutineViewModel(modelContext: modelContext))
     }
 
     var body: some View {
@@ -36,6 +38,7 @@ struct ContentView: View {
                 activityLogViewModel: activityLogViewModel,
                 workoutSessionViewModel: workoutSessionViewModel,
                 achievementsViewModel: achievementsViewModel,
+                routineViewModel: routineViewModel,
                 activityMonitor: activityMonitor
             )
 
@@ -177,6 +180,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    let container = try! ModelContainer(for: Exercise.self, Achievement.self, ActivityLog.self, Progress.self, UserPreferences.self, WorkoutSession.self)
+    let container = try! ModelContainer(for: Exercise.self, Achievement.self, ActivityLog.self, Progress.self, UserPreferences.self, WorkoutSession.self, Routine.self)
     ContentView(modelContext: container.mainContext)
 }

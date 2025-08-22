@@ -11,7 +11,8 @@ struct MicroMoveApp: App {
             ActivityLog.self,
             Progress.self,
             UserPreferences.self,
-            WorkoutSession.self
+            WorkoutSession.self,
+            Routine.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
