@@ -6,7 +6,6 @@ struct RoutineDetailView: View {
 
     @State private var showExercisePicker = false
     @State private var triggerExercise: Exercise? = nil
-    @State private var showTriggerEditor = false
 
     private func triggers(for exercise: Exercise) -> [RoutineTrigger] {
         routine.routineTriggers.filter { $0.exercise?.id == exercise.id }
@@ -14,11 +13,17 @@ struct RoutineDetailView: View {
 
     var body: some View {
         List {
-           Section {
+            Section {
                 Toggle("Active", isOn: Binding(
                     get: { routine.isActive },
                     set: { routineViewModel.toggleActivateRoutine(routine, $0) }
                 ))
+            }
+
+            if let notes = routine.notes, !notes.isEmpty {
+                Section("Notes") {
+                    Text(notes)
+                }
             }
 
             ForEach(routine.routineExercise, id: \.id) { ex in
@@ -38,7 +43,6 @@ struct RoutineDetailView: View {
                     }
                     Button("Add Trigger") {
                         triggerExercise = ex
-                        showTriggerEditor = true
                     }
                     .font(.footnote)
                 }
