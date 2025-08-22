@@ -113,8 +113,7 @@ class ExercisesViewModel: ObservableObject {
             case .beginner:
                 list = list.filter { $0.duration <= 2 }
             case .intermediate:
-//                list = list.filter { (3...4).contains($0.duration) }
-            list = list.filter { $0.duration >= 3 && $0.duration <= 4 }
+                list = list.filter { $0.duration >= 3 && $0.duration <= 4 }
             case .advanced:
                 list = list.filter { $0.duration >= 5 }
             case .none:
