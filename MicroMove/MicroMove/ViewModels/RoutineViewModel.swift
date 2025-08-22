@@ -70,8 +70,9 @@ class RoutineViewModel: ObservableObject {
         fetchRoutines()
     }
 
-    func addTrigger(_ routine: Routine, _ triggerType: TriggerType, params: [String:String] = [:]) {
-        let trigger = RoutineTrigger(triggerType: triggerType, params: params)
+    /// Adds a trigger to a routine for a specific exercise (if provided).
+    func addTrigger(_ routine: Routine, _ triggerType: TriggerType, exercise: Exercise? = nil, params: [String:String] = [:]) {
+        let trigger = RoutineTrigger(triggerType: triggerType, params: params, exercise: exercise)
         routine.routineTriggers.append(trigger)
         save()
         fetchRoutines()
