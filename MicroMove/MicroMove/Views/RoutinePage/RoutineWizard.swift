@@ -1,104 +1,183 @@
 import SwiftUI
-import SwiftData
 
 struct RoutineWizard: View {
     @ObservedObject var routineViewModel: RoutineViewModel
+    @ObservedObject var exercisesViewModel: ExercisesViewModel
+    @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.modelContext) private var modelContext
 
-    @State private var name: String = ""
-    @State private var notes: String = ""
+    // Inputs
+    @State private var name = ""
+    @State private var notes = ""
     @State private var isActive = false
-    @FocusState private var nameFieldFocused: Bool
+    @FocusState private var nameFocused: Bool
 
-    @State private var recommendedExercises: [Exercise] = []
+    // Selection
     @State private var selectedExerciseIDs: Set<UUID> = []
-    @State private var searchText: String = ""
+
+    private var recommended: [Exercise] {
+        guard let prefs = userPreferencesViewModel.userPreferences else { return [] }
+        return exercisesViewModel.getRecommendedExercises(from: exercisesViewModel.exercises, prefs: prefs)
+    }
+    private var others: [Exercise] {
+        let recIDs = Set(recommended.map { $0.id })
+        return exercisesViewModel.exercises.filter { !recIDs.contains($0.id) }
+    }
 
     private var saveDisabled: Bool {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private var filteredExercises: [Exercise] {
-        guard !searchText.isEmpty else { return recommendedExercises }
-        return recommendedExercises.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-    }
-
     var body: some View {
-        Form {
-            Section {
-                TextField("Routine name", text: $name)
-                    .focused($nameFieldFocused)
-                TextField("Notes", text: $notes, axis: .vertical)
-            }
-            Section {
-                Toggle("Active", isOn: $isActive)
-            }
+        ZStack {
+            Color(.systemGray6).ignoresSafeArea()
 
-            if !recommendedExercises.isEmpty {
-                Section("Recommended Exercises") {
-                    ForEach(filteredExercises, id: \.id) { ex in
-                        Button(action: { toggleSelection(ex) }) {
-                            HStack {
-                                Text(ex.name)
-                                Spacer()
-                                if selectedExerciseIDs.contains(ex.id) {
-                                    Image(systemName: "checkmark")
-                                        .foregroundColor(.accentColor)
+            ScrollView {
+                VStack(spacing: 16) {
+                    // Header
+                    HStack {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Create Routine").font(.largeTitle.bold())
+                            Text("Pick a name, choose exercises, and set it active.")
+                                .font(.subheadline).foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "list.bullet.rectangle.portrait")
+                            .font(.title2).foregroundColor(.accentColor)
+                    }
+                    .padding(.horizontal, 16)
+
+                    // Basics
+                    Card {
+                        Text("Basics").font(.headline)
+
+                        TextField("Routine name", text: $name)
+                            .textInputAutocapitalization(.words)
+                            .submitLabel(.done)
+                            .focused($nameFocused)
+                            .padding(12)
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        TextField("Notes (optional)", text: $notes, axis: .vertical)
+                            .padding(12)
+                            .background(Color(.systemGray6))
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+
+                        Toggle("Active", isOn: $isActive).tint(.black)
+                    }
+
+                    // Recommended
+                    Card {
+                        HStack {
+                            Text("Recommended").font(.headline)
+                            Spacer()
+                            if !recommended.isEmpty {
+                                Button("Add all") {
+                                    selectedExerciseIDs.formUnion(recommended.map { $0.id })
+                                }
+                                .font(.footnote.weight(.semibold))
+                            }
+                        }
+
+                        if recommended.isEmpty {
+                            Text("No recommendations yet.")
+                                .font(.subheadline).foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        } else {
+                            LazyVStack(spacing: 10) {
+                                ForEach(recommended, id: \.id) { ex in
+                                    ExerciseRowCard(
+                                        exercise: ex,
+                                        isSelected: selectedExerciseIDs.contains(ex.id),
+                                        onToggle: { toggleSelection(ex) }
+                                    )
                                 }
                             }
                         }
                     }
+
+                    // All others
+                    Card {
+                        HStack {
+                            Text("All Exercises").font(.headline)
+                            Spacer()
+                            if !others.isEmpty {
+                                Button("Add all") {
+                                    selectedExerciseIDs.formUnion(others.map { $0.id })
+                                }
+                                .font(.footnote.weight(.semibold))
+                            }
+                        }
+
+                        if others.isEmpty {
+                            Text("No other exercises.")
+                                .font(.subheadline).foregroundColor(.secondary)
+                                .padding(.top, 8)
+                        } else {
+                            LazyVStack(spacing: 10) {
+                                ForEach(others, id: \.id) { ex in
+                                    ExerciseRowCard(
+                                        exercise: ex,
+                                        isSelected: selectedExerciseIDs.contains(ex.id),
+                                        onToggle: { toggleSelection(ex) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    .padding(.bottom, 80)
                 }
+                .padding(.vertical, 12)
             }
         }
         .navigationTitle("New Routine")
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { dismiss() }
-            }
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
-                    let routine = Routine(
-                        name: name,
-                        notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes,
-                        isActive: isActive
-                    )
-                    routineViewModel.addRoutine(routine)
-                    let selected = recommendedExercises.filter { selectedExerciseIDs.contains($0.id) }
-                    selected.forEach { routineViewModel.addExercise(routine, $0) }
-                    dismiss()
+        .navigationBarTitleDisplayMode(.inline)
+        .safeAreaInset(edge: .bottom) {
+            HStack(spacing: 12) {
+                Button(role: .cancel) { dismiss() } label: {
+                    Text("Discard").frame(maxWidth: .infinity)
+                }
+
+                Button { saveRoutine() } label: {
+                    Text(selectedExerciseIDs.isEmpty ? "Save" : "Save (\(selectedExerciseIDs.count))")
+                        .frame(maxWidth: .infinity)
                 }
                 .disabled(saveDisabled)
+                .opacity(saveDisabled ? 0.6 : 1)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(.ultraThinMaterial)
         }
         .onAppear {
-            nameFieldFocused = true
-            loadRecommendedExercises()
-        }
-        .searchable(text: $searchText)
-    }
-
-    private func loadRecommendedExercises() {
-        do {
-            let descriptor = FetchDescriptor<Exercise>()
-            let all = try modelContext.fetch(descriptor)
-            if let prefs = try modelContext.fetch(FetchDescriptor<UserPreferences>()).first {
-                let vm = ExercisesViewModel(modelContext: modelContext)
-                recommendedExercises = vm.getRecommendedExercises(from: all, prefs: prefs)
-            } else {
-                recommendedExercises = []
-            }
-        } catch {
-            recommendedExercises = []
+            exercisesViewModel.fetchExercises()
+            userPreferencesViewModel.fetchUserPreferences()
+            nameFocused = true
         }
     }
 
+    //Actions
     private func toggleSelection(_ exercise: Exercise) {
         if selectedExerciseIDs.contains(exercise.id) {
             selectedExerciseIDs.remove(exercise.id)
         } else {
             selectedExerciseIDs.insert(exercise.id)
         }
+    }
+
+    private func saveRoutine() {
+        let routine = Routine(
+            name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            notes: notes.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : notes,
+            isActive: isActive
+        )
+        routineViewModel.addRoutine(routine)
+
+        let chosenIDs = selectedExerciseIDs
+        for e in exercisesViewModel.exercises where chosenIDs.contains(e.id) {
+            routineViewModel.addExercise(routine, e)
+        }
+        dismiss()
     }
 }

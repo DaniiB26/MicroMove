@@ -3,6 +3,8 @@ import SwiftUI
 struct RoutineDetailView: View {
     let routine: Routine
     @ObservedObject var routineViewModel: RoutineViewModel
+    @ObservedObject var exercisesViewModel: ExercisesViewModel
+    @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
 
     @State private var showExercisePicker = false
     @State private var triggerExercise: Exercise? = nil
@@ -12,61 +14,90 @@ struct RoutineDetailView: View {
     }
 
     var body: some View {
-        List {
-            Section {
-                Toggle("Active", isOn: Binding(
-                    get: { routine.isActive },
-                    set: { routineViewModel.toggleActivateRoutine(routine, $0) }
-                ))
-            }
+        ZStack {
+            Color(.systemGray6).ignoresSafeArea()
 
-            if let notes = routine.notes, !notes.isEmpty {
-                Section("Notes") {
-                    Text(notes)
-                }
-            }
-
-            ForEach(routine.routineExercise, id: \.id) { ex in
-                Section(ex.name) {
-                    let tgs = triggers(for: ex)
-                    if tgs.isEmpty {
-                        Text("No triggers").foregroundColor(.secondary)
-                    } else {
-                        ForEach(tgs, id: \.id) { trig in
-                            Text(trig.humanReadable)
-                                .swipeActions {
-                                    Button(role: .destructive) {
-                                        routineViewModel.removeTrigger(routine, trig)
-                                    } label: { Label("Delete", systemImage: "trash") }
-                                }
+            ScrollView {
+                VStack(spacing: 16) {
+                    Card {
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(routine.name)
+                                    .font(.title3.bold())
+                                Text("Routine")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Toggle(isOn: Binding(
+                                get: { routine.isActive },
+                                set: { routineViewModel.toggleActivateRoutine(routine, $0) }
+                            )) {
+                                StatusPill(isOn: routine.isActive)
+                            }
+                            .labelsHidden()
+                            .tint(.black)
+                        }
+                        if let created = routine.createdAt as Date? {
+                            Text("Created \(created.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                     }
-                    Button("Add Trigger") {
-                        triggerExercise = ex
+                    // Notes card (only if present)
+                    if let notes = routine.notes, !notes.isEmpty {
+                        Card {
+                            SectionHeader(title: "Notes")
+                            Text(notes)
+                                .font(.body)
+                                .foregroundColor(.primary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
                     }
-                    .font(.footnote)
-                }
-                .swipeActions {
-                    Button(role: .destructive) {
-                        routineViewModel.removeExercise(routine, ex)
-                    } label: { Label("Delete", systemImage: "trash") }
-                }
-            }
 
-            if routine.routineExercise.isEmpty {
-                Section("Exercises") {
-                    Text("No exercises yet").foregroundColor(.secondary)
+                    Card {
+                        HStack {
+                            SectionHeader(title: "Exercises")
+                            Spacer()
+                            Button {
+                                showExercisePicker = true
+                            } label: {
+                                Label("Add", systemImage: "plus.circle.fill")
+                                    .font(.subheadline.bold())
+                            }
+                        }
+
+                        if routine.routineExercise.isEmpty {
+                            EmptyStateView(
+                                title: "No exercises yet",
+                                subtitle: "Add one to start attaching triggers."
+                            )
+                            .padding(.top, 8)
+                        } else {
+                            VStack(spacing: 12) {
+                                ForEach(routine.routineExercise, id: \.id) { ex in
+                                    ExerciseBlock(
+                                        exercise: ex,
+                                        triggers: triggers(for: ex),
+                                        onRemoveExercise: { routineViewModel.removeExercise(routine, ex) },
+                                        onRemoveTrigger: { trig in
+                                            routineViewModel.removeTrigger(routine, trig)
+                                        },
+                                        onAddTrigger: { triggerExercise = ex }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    Spacer(minLength: 24)
                 }
+                .padding(.vertical, 12)
             }
         }
-        .navigationTitle(routine.name)
-        .toolbar {
-            Button("Add Exercise") {
-                showExercisePicker = true
-            }
-        }
+        .navigationTitle("Routine")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showExercisePicker) {
-            ExerciseSelectionView(routine: routine, routineViewModel: routineViewModel)
+            ExerciseSelectionView(routine: routine, routineViewModel: routineViewModel, exercisesViewModel: exercisesViewModel, userPreferencesViewModel: userPreferencesViewModel)
         }
         .sheet(item: $triggerExercise) { ex in
             TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ex)
