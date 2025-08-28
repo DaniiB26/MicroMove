@@ -9,6 +9,7 @@ struct BottomTabBar: View {
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @ObservedObject var achievementsViewModel: AchievementsViewModel
     @ObservedObject var routineViewModel: RoutineViewModel
+    @ObservedObject var exercisesViewModel: ExercisesViewModel
     var activityMonitor: ActivityMonitor?
 
     var body: some View {
@@ -20,7 +21,7 @@ struct BottomTabBar: View {
                             .ignoresSafeArea()
 
                         VStack(spacing: 16) {
-                            HomeView(progressViewModel: progressViewModel, userPreferencesViewModel: userPreferencesViewModel, routineViewModel: routineViewModel)
+                            HomeView(progressViewModel: progressViewModel, userPreferencesViewModel: userPreferencesViewModel, routineViewModel: routineViewModel, exercisesViewModel: exercisesViewModel)
                         }
                         .padding(.horizontal)
                         .padding(.top, 12)

@@ -4,6 +4,7 @@ struct HomeView: View {
     @ObservedObject var progressViewModel: ProgressViewModel
     @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
     @ObservedObject var routineViewModel: RoutineViewModel
+    @ObservedObject var exercisesViewModel: ExercisesViewModel
 
     var body: some View {
         ZStack {
@@ -16,7 +17,7 @@ struct HomeView: View {
                         GreetingView(progressViewModel: progressViewModel, userPreferencesViewModel: userPreferencesViewModel)
                         CalendarView(progressViewModel: progressViewModel)
                         Spacer()
-                        StartWorkoutButton(destination: RoutineListView(routineViewModel: routineViewModel))
+                        StartWorkoutButton(destination: RoutineListView(routineViewModel: routineViewModel, exercisesViewModel: exercisesViewModel, userPreferencesViewModel: userPreferencesViewModel))
                         Spacer()
                     }
                     .padding(.top, 12)
