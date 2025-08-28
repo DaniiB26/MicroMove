@@ -24,22 +24,39 @@ extension RoutineTrigger {
     var humanReadable: String {
         switch triggerType {
         case .timeRecurring:
-            let hour = params[TriggerParamKeys.hour] ?? "--"
-            let minute = params[TriggerParamKeys.minute] ?? "--"
-            return "Every day at \(hour):\(minute)"
+            if let hourStr = params[TriggerParamKeys.hour],
+            let minuteStr = params[TriggerParamKeys.minute],
+            let hour = Int(hourStr),
+            let minute = Int(minuteStr) {
+                let formatted = String(format: "%02d:%02d", hour, minute)
+                return "Every day at \(formatted)"
+            }
+            return "Every day at --:--"
+
         case .inactivityMinutes:
-            let mins = params[TriggerParamKeys.minutes] ?? "?"
-            return "Inactive for \(mins)m"
+            if let mins = params[TriggerParamKeys.minutes] {
+                return "Inactive for \(mins) minutes"
+            }
+            return "Inactive (time unknown)"
+
         case .healthNoStandHour:
             let hrs = params[TriggerParamKeys.thresholdHours] ?? "1"
-            return "No stand hour for \(hrs)h"
+            return "No stand hour for \(hrs) hours"
+
         case .deviceIdle:
-            let mins = params[TriggerParamKeys.idleMinutes] ?? "?"
-            return "Device idle \(mins)m"
+            if let mins = params[TriggerParamKeys.idleMinutes] {
+                return "Device idle for \(mins) minutes"
+            }
+            return "Device idle (time unknown)"
+
         case .homeAutomation:
-            if let event = params[TriggerParamKeys.event] { return event }
-            if let ssid = params[TriggerParamKeys.ssid] { return "Wi‑Fi: \(ssid)" }
-            return "Home automation"
+            if let event = params[TriggerParamKeys.event] {
+                return "Home automation: \(event)"
+            }
+            if let ssid = params[TriggerParamKeys.ssid] {
+                return "Wi-Fi connected to \(ssid)"
+            }
+            return "Home automation trigger"
         }
     }
 }
