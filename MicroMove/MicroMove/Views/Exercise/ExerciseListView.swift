@@ -27,7 +27,7 @@ struct ExerciseListView: View {
     }
 
     var body: some View {
-        NavigationStack {
+
             VStack(spacing: 16) {
                 //TITLE
                 HStack {
@@ -128,7 +128,6 @@ struct ExerciseListView: View {
                 //     exerciseViewModel.deleteAllExercises(modelContext: modelContext)
                 // }
             }
-        }
         .background(Color(.systemGray6))
     }
 }

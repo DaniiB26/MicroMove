@@ -38,7 +38,7 @@ struct BottomTabBar: View {
                 //     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 //     .background(Color(.systemGray6))
                 ExerciseListView(
-                    exerciseViewModel: ExercisesViewModel(modelContext: modelContext),
+                    exerciseViewModel: exercisesViewModel,
                     activityLogViewModel: activityLogViewModel,
                     workoutSessionViewModel: workoutSessionViewModel,
                     progressViewModel: progressViewModel,
@@ -51,14 +51,17 @@ struct BottomTabBar: View {
             }
 
             // Achievements tab
-            NavigationStack {
-                Text("Achievements View (To be implemented)")
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemGray6))
-                // AchievementListView(
-                //     viewModel: achievementsViewModel
-                // )
-            }
+            // NavigationStack {
+            //     // Text("Achievements View (To be implemented)")
+            //     //     .frame(maxWidth: .infinity, maxHeight: .infinity)
+            //     //     .background(Color(.systemGray6))
+            //     AchievementListView(
+            //         viewModel: achievementsViewModel
+            //     )
+            // }
+            AchievementListView(
+                viewModel: achievementsViewModel
+            )
             .tabItem {
                 Label("Achievements", systemImage: "medal")
             }
