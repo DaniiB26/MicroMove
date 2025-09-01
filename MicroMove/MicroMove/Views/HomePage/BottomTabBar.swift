@@ -65,6 +65,14 @@ struct BottomTabBar: View {
             .tabItem {
                 Label("Achievements", systemImage: "medal")
             }
+
+            // Activity Log tab
+            ActivityListView(
+                viewModel: activityLogViewModel
+            )
+            .tabItem {
+                Label("Activity", systemImage: "clock")
+            }
         }
         .accentColor(.black)
     }

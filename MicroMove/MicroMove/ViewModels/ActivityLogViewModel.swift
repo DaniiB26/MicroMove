@@ -31,9 +31,9 @@ class ActivityLogViewModel: ObservableObject {
 
     /// Adds a new activity log to the data store and updates the list.
     func addActivityLog(_ activityLog: ActivityLog) {
-        // modelContext.insert(activityLog)
-        // activityLogs.append(activityLog)
-        // print("[ActivityLogViewModel] Added activity log: \(activityLog.activityDesc)")
+        modelContext.insert(activityLog)
+        activityLogs.append(activityLog)
+        print("[ActivityLogViewModel] Added activity log: \(activityLog.activityDesc)")
     }
 
     /// Saves changes to an existing activity log. Call after modifying an activity log's properties.
@@ -56,6 +56,19 @@ class ActivityLogViewModel: ObservableObject {
             print("[ActivityLogViewModel] Deleted activity log: \(activityLog.activityDesc)")
         } catch {
             errorMessage = "Error deleting activity log: \(error.localizedDescription)"
+        }
+    }
+
+    func deleteAllLogs() {
+        do {
+            let descriptor = FetchDescriptor<ActivityLog>()
+            let all = try modelContext.fetch(descriptor)
+            all.forEach { modelContext.delete($0) }
+            try modelContext.save()
+            activityLogs.removeAll()
+            print("[ActivityLogViewModel] Deleted ALL activity logs.")
+        } catch {
+            errorMessage = "Error deleting all activity logs: \(error.localizedDescription)"
         }
     }
 

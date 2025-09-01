@@ -1,21 +1,56 @@
 import SwiftUI
 
 struct ActivityListView: View {
-    @Environment(\.modelContext) private var modelContext
     @ObservedObject var viewModel: ActivityLogViewModel
+    @State private var showDeleteAll = false
 
     var body: some View {
         NavigationStack {
-            // List of activity logs, sorted by newest first
-            List(viewModel.activityLogs.sorted(by: { $0.timestamp > $1.timestamp }), id: \.id) { log in
-                NavigationLink(destination: ActivityDetailView(viewModel: viewModel, activityLog: log)) {
-                    ActivityRowView(activityLog: log)
+            ZStack {
+                // Page background
+                Color(.systemGray6).ignoresSafeArea()
+
+                ScrollView {
+                    LazyVStack(spacing: 12) {
+                        if viewModel.activityLogs.isEmpty {
+                            EmptyStateView(
+                                title: "No activity yet",
+                                subtitle: "Your logs will appear here."
+                            )
+                            .padding(.top, 40)
+                        } else {
+                            ForEach(
+                                viewModel.activityLogs.sorted(by: { $0.timestamp > $1.timestamp }),
+                                id: \.id
+                            ) { log in
+                                NavigationLink {
+                                    ActivityDetailView(viewModel: viewModel, activityLog: log)
+                                } label: {
+                                    ActivityRowView(activityLog: log)
+                                        .padding(.horizontal, 16)
+                                }
+                                .buttonStyle(.plain)       // keep the card appearance
+                                .contentShape(Rectangle()) // whole card tappable
+                            }
+                        }
+                    }
+                    .padding(.vertical, 16)
                 }
             }
             .navigationTitle("Activity Log")
-            .onAppear {
-                viewModel.fetchActivityLogs()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(role: .destructive) { showDeleteAll = true } label: {
+                        Image(systemName: "trash")
+                    }
+                }
             }
+            .confirmationDialog("Delete all logs?", isPresented: $showDeleteAll) {
+                Button("Delete All", role: .destructive) {
+                    viewModel.deleteAllLogs()
+                }
+            }
+            .onAppear { viewModel.fetchActivityLogs() }
         }
     }
 }

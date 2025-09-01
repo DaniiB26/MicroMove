@@ -19,13 +19,30 @@ final class ActivityLog {
 
     /// Types of activities that can be logged.
     enum ActivityType: String, Codable {
-        /// Only .exerciseStart and .exerciseComplete are considered for inactivity detection.
         case appOpen
         case exerciseStart
         case exerciseComplete
         case reminderTriggered
         case reminderResponded
         case inactivityDetected
+
+        /// A more human-friendly label for UI
+        var displayName: String {
+            switch self {
+            case .appOpen:
+                return "App Opened"
+            case .exerciseStart:
+                return "Exercise Started"
+            case .exerciseComplete:
+                return "Exercise Completed"
+            case .reminderTriggered:
+                return "Reminder Sent"
+            case .reminderResponded:
+                return "Reminder Acknowledged"
+            case .inactivityDetected:
+                return "Inactivity Detected"
+            }
+        }
     }
     
     /// Contexts for different times of day.

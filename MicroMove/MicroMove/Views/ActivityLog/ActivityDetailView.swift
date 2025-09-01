@@ -13,7 +13,7 @@ struct ActivityDetailView: View {
                 Image(systemName: iconName(for: activityLog.type))
                     .font(.largeTitle)
                     .foregroundColor(.accentColor)
-                Text(activityLog.type.rawValue.capitalized)
+                Text(activityLog.type.displayName)
                     .font(.title)
                     .bold()
                 Spacer()
