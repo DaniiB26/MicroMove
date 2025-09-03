@@ -28,5 +28,9 @@
     <array>
         <string>DotGothic16-Regular.ttf</string>
     </array>
+    <key>NSHealthShareUsageDescription</key>
+    <string>MicroMove uses your Health data (such as Stand Time) to personalize reminders and track your activity.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>MicroMove writes workouts you complete so they appear in the Health app.</string>
 </dict>
 </plist>
