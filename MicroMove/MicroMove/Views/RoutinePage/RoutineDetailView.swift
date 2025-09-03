@@ -8,6 +8,8 @@ struct RoutineDetailView: View {
 
     @State private var showExercisePicker = false
     @State private var triggerExercise: Exercise? = nil
+    @State private var editingTrigger: RoutineTrigger? = nil
+    @State private var showEditTrigger = false
 
     private func triggers(for exercise: Exercise) -> [RoutineTrigger] {
         routine.routineTriggers.filter { $0.exercise?.id == exercise.id }
@@ -83,7 +85,11 @@ struct RoutineDetailView: View {
                                         onRemoveTrigger: { trig in
                                             routineViewModel.removeTrigger(routine, trig)
                                         },
-                                        onAddTrigger: { triggerExercise = ex }
+                                        onAddTrigger: { triggerExercise = ex },
+                                        onEditTrigger: { trig in
+                                            editingTrigger = trig
+                                            showEditTrigger = true
+                                        }
                                     )
                                 }
                             }
@@ -101,6 +107,11 @@ struct RoutineDetailView: View {
         }
         .sheet(item: $triggerExercise) { ex in
             TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ex)
+        }
+        .sheet(isPresented: $showEditTrigger, onDismiss: { editingTrigger = nil }) {
+            if let trig = editingTrigger, let ex = trig.exercise {
+                TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ex, trigger: trig)
+            }
         }
     }
 }
