@@ -48,6 +48,7 @@ struct ActivityRowView: View {
         case .reminderTriggered:  return "bell"
         case .reminderResponded:  return "bell.badge.fill"
         case .inactivityDetected: return "zzz"
+        case .triggerEvaluation:  return "bell.badge"
         }
     }
 
@@ -59,6 +60,7 @@ struct ActivityRowView: View {
         case .reminderTriggered:  return .purple
         case .reminderResponded:  return .indigo
         case .inactivityDetected: return .gray
+        case .triggerEvaluation:  return .teal
         }
     }
 }

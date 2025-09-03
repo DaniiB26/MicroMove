@@ -6,7 +6,8 @@ class RoutineViewModel: ObservableObject {
     @Published var routines: [Routine] = []
     @Published var errorMessage: String?
 
-    private var modelContext: ModelContext    
+    private var modelContext: ModelContext
+    var onTriggerChanged: (() -> Void)?    
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -47,6 +48,7 @@ class RoutineViewModel: ObservableObject {
             modelContext.delete(routine)
             try modelContext.save()
             routines.removeAll { $0.id == routine.id }
+            onTriggerChanged?()
         } catch {
             errorMessage = "Error deleting routine: \(error.localizedDescription)"
         }
@@ -56,18 +58,21 @@ class RoutineViewModel: ObservableObject {
         routine.isActive = active
         save()
         fetchRoutines()
+        onTriggerChanged?()
     }
 
     func addExercise(_ routine: Routine, _ exercise: Exercise) {
         routine.routineExercise.append(exercise)
         save()
         fetchRoutines()
+        onTriggerChanged?()
     }
 
     func removeExercise(_ routine: Routine, _ exercise: Exercise) {
         routine.routineExercise.removeAll {$0.id == exercise.id}
         save()
         fetchRoutines()
+        onTriggerChanged?()
     }
 
     /// Adds a trigger to a routine for a specific exercise (if provided).
@@ -76,14 +81,29 @@ class RoutineViewModel: ObservableObject {
         routine.routineTriggers.append(trigger)
         save()
         fetchRoutines()
-        //TODO: Schedule Trigger?
+        onTriggerChanged?()
+    }
+
+    func updateTrigger(_ trigger: RoutineTrigger, params: [String:String]) {
+        trigger.params = params
+        save()
+        fetchRoutines()
+        onTriggerChanged?()
+    }
+    
+    func updateTrigger(_ trigger: RoutineTrigger, triggerType: TriggerType, params: [String:String]) {
+        trigger.triggerType = triggerType
+        trigger.params = params
+        save()
+        fetchRoutines()
+        onTriggerChanged?()
     }
 
     func removeTrigger(_ routine: Routine, _ routineTrigger: RoutineTrigger) {
         routine.routineTriggers.removeAll { $0.id == routineTrigger.id }
         save()
         fetchRoutines()
-        //TODO: Deactivate Trigger Notifications?
+        onTriggerChanged?()
     }
 
     func save() {

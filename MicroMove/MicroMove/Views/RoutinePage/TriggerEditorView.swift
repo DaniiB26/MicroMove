@@ -6,6 +6,7 @@ struct TriggerEditorView: View {
     let routine: Routine
     @ObservedObject var routineViewModel: RoutineViewModel
     let exercise: Exercise
+    let trigger: RoutineTrigger?
 
     // State
     @State private var selectedType: TriggerType = .timeRecurring
@@ -15,6 +16,49 @@ struct TriggerEditorView: View {
     @State private var thresholdHours: Int = 1
     @State private var event: String = ""
     @State private var ssid: String  = ""
+
+    init(routine: Routine, routineViewModel: RoutineViewModel, exercise: Exercise, trigger: RoutineTrigger? = nil) {
+        self.routine = routine
+        self._routineViewModel = ObservedObject(wrappedValue: routineViewModel)
+        self.exercise = exercise
+        self.trigger = trigger
+
+        if let trig = trigger {
+            _selectedType = State(initialValue: trig.triggerType)
+            switch trig.triggerType {
+            case .timeRecurring:
+                if let hourStr = trig.params[TriggerParamKeys.hour],
+                   let minuteStr = trig.params[TriggerParamKeys.minute],
+                   let hour = Int(hourStr),
+                   let minute = Int(minuteStr),
+                   let date = Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: Date()) {
+                    _timeOfDay = State(initialValue: date)
+                }
+            case .inactivityMinutes:
+                if let mins = trig.params[TriggerParamKeys.minutes],
+                   let m = Int(mins) {
+                    _minutes = State(initialValue: m)
+                }
+            case .healthNoStandHour:
+                if let hrs = trig.params[TriggerParamKeys.thresholdHours],
+                   let h = Int(hrs) {
+                    _thresholdHours = State(initialValue: h)
+                }
+            case .deviceIdle:
+                if let mins = trig.params[TriggerParamKeys.idleMinutes],
+                   let m = Int(mins) {
+                    _idleMinutes = State(initialValue: m)
+                }
+            case .homeAutomation:
+                if let e = trig.params[TriggerParamKeys.event] {
+                    _event = State(initialValue: e)
+                }
+                if let s = trig.params[TriggerParamKeys.ssid] {
+                    _ssid = State(initialValue: s)
+                }
+            }
+        }
+    }
 
     private var canSave: Bool {
         switch selectedType {
@@ -28,6 +72,8 @@ struct TriggerEditorView: View {
         }
     }
 
+    private var isEditing: Bool { trigger != nil }
+
     var body: some View {
         ZStack {
             Color(.systemGray6).ignoresSafeArea()
@@ -38,7 +84,7 @@ struct TriggerEditorView: View {
                     // Header
                     HStack {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text("New Trigger")
+                            Text(isEditing ? "Edit Trigger" : "New Trigger")
                                 .font(.largeTitle.bold())
                             Text(exercise.name)
                                 .font(.subheadline)
@@ -141,10 +187,21 @@ struct TriggerEditorView: View {
                 }
                 .buttonStyle(SecondarySoftButton())
 
+                if isEditing {
+                    Button(role: .destructive) {
+                        deleteTrigger()
+                    } label: {
+                        Text("Delete")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(SecondarySoftButton())
+                }
+
+
                 Button {
                     save()
                 } label: {
-                    Text("Save Trigger")
+                    Text(isEditing ? "Save" : "Save Trigger")
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(PrimaryFilledButton())
@@ -181,7 +238,18 @@ struct TriggerEditorView: View {
             if !ssid.isEmpty  { params[TriggerParamKeys.ssid]  = ssid  }
         }
 
-        routineViewModel.addTrigger(routine, selectedType, exercise: exercise, params: params)
+        if let trig = trigger {
+            routineViewModel.updateTrigger(trig, triggerType: selectedType, params: params)
+        } else {
+            routineViewModel.addTrigger(routine, selectedType, exercise: exercise, params: params)
+        }
+        dismiss()
+    }
+
+    private func deleteTrigger() {
+        if let trig = trigger {
+            routineViewModel.removeTrigger(routine, trig)
+        }
         dismiss()
     }
 }

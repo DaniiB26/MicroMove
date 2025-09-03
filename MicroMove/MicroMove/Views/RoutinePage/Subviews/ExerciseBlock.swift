@@ -6,6 +6,7 @@ struct ExerciseBlock: View {
     let onRemoveExercise: () -> Void
     let onRemoveTrigger: (RoutineTrigger) -> Void
     let onAddTrigger: () -> Void
+    let onEditTrigger: (RoutineTrigger) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -41,6 +42,8 @@ struct ExerciseBlock: View {
                             text: trig.humanReadable,
                             onDelete: { onRemoveTrigger(trig) }
                         )
+                        .contentShape(Rectangle())
+                        .onTapGesture { onEditTrigger(trig) }
                     }
                 }
             }
