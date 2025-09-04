@@ -21,6 +21,12 @@ struct ActivityRowView: View {
                 Text(activityLog.dayContext.rawValue.capitalized)
                     .font(.caption)
                     .foregroundColor(.secondary)
+
+                if activityLog.type == .triggerEvaluation || activityLog.type == .reminderTriggered {
+                    Text(activityLog.responded ?? false ? "Responded" : "Not Responded")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Spacer()
