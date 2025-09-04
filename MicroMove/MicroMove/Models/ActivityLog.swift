@@ -16,6 +16,10 @@ final class ActivityLog {
     var duration: Int
     /// Context of the day when the activity occurred.
     var dayContext: ActivityDayContext
+    /// The type of trigger associated with this log, if any.
+    var triggerType: TriggerType?
+    /// Indicates whether the user responded to the trigger, if applicable.
+    var responded: Bool?
 
     /// Types of activities that can be logged.
     enum ActivityType: String, Codable {
@@ -25,6 +29,7 @@ final class ActivityLog {
         case reminderTriggered
         case reminderResponded
         case inactivityDetected
+        case triggerEvaluation
 
         /// A more human-friendly label for UI
         var displayName: String {
@@ -41,6 +46,8 @@ final class ActivityLog {
                 return "Reminder Acknowledged"
             case .inactivityDetected:
                 return "Inactivity Detected"
+            case .triggerEvaluation:
+                return "Trigger Evaluated"
             }
         }
     }
@@ -60,7 +67,9 @@ final class ActivityLog {
         type: ActivityType,
         activityDesc: String,
         duration: Int,
-        dayContext: ActivityDayContext
+        dayContext: ActivityDayContext,
+        triggerType: TriggerType? = nil,
+        responded: Bool? = nil
     ) {
         self.id = id
         self.timestamp = timestamp
@@ -68,5 +77,7 @@ final class ActivityLog {
         self.activityDesc = activityDesc
         self.duration = duration
         self.dayContext = dayContext
+        self.triggerType = triggerType
+        self.responded = responded
     }
 }
