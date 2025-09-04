@@ -15,6 +15,7 @@ struct ContentView: View {
     @StateObject private var routineViewModel: RoutineViewModel
     @StateObject private var exercisesViewModel: ExercisesViewModel
     @State private var activityMonitor: ActivityMonitor? = nil
+    @State private var routineNotificationCoordinator: RoutineNotificationCoordinator? = nil
     @State private var showAchievementBanner = false
     @State private var bannerAchievement: Achievement?
 
@@ -164,14 +165,38 @@ struct ContentView: View {
         }
         .onAppear {
             if activityMonitor == nil {
+                // ActivityMonitor requests notification permission during init
                 activityMonitor = ActivityMonitor(activityLogViewModel: activityLogViewModel, userPreferencesViewModel: userPreferencesViewModel)
-                activityMonitor?.requestNotificationPermission()
+            }
+            if routineNotificationCoordinator == nil {
+                routineNotificationCoordinator = RoutineNotificationCoordinator(
+                    activityLogViewModel: activityLogViewModel,
+                    routines: routineViewModel.routines,
+                    exercises: exercisesViewModel.exercises
+                )
+                routineViewModel.onTriggerChanged = {
+                    self.routineNotificationCoordinator?.updateData(
+                        routines: self.routineViewModel.routines,
+                        exercises: self.exercisesViewModel.exercises
+                    )
+                    // On config changes, reschedule without immediately firing inactivity/health checks
+                    self.routineNotificationCoordinator?.scheduleAllTriggers()
+                }
             }
             if !Self.hasLoggedAppOpen {
                 activityLogViewModel.addAppOpen()
                 Self.hasLoggedAppOpen = true
             }
             activityMonitor?.checkAndScheduleReminder()
+            routineNotificationCoordinator?.scheduleAllTriggers()
+            
+            // Share coordinators with AppDelegate
+            if let appDelegate = UIApplication.shared.delegate as? AppDelegate {
+                // Ensure AppDelegate uses the same ActivityLogViewModel instance
+                appDelegate.activityLogViewModel = activityLogViewModel
+                appDelegate.activityMonitor = activityMonitor
+                appDelegate.routineNotificationCoordinator = routineNotificationCoordinator
+            }
         }
         // .onReceive(progressViewModel.$lastUnlockedAchievement) { achievement in
         //     if let achievement = achievement {

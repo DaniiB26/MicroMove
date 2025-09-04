@@ -126,7 +126,7 @@ class ActivityLogViewModel: ObservableObject {
     }
 
     /// Logs when a reminder is triggered.
-    func addReminderTriggered() {
+    func addReminderTriggered() -> ActivityLog {
         let now = Date()
         let log = ActivityLog(
             id: UUID(),
@@ -137,6 +137,21 @@ class ActivityLogViewModel: ObservableObject {
             dayContext: getDayContext(for: now)
         )
         addActivityLog(log)
+        return log
+    }
+
+    /// Logs when a reminder is triggered at a specific time (e.g., delivery time).
+    func addReminderTriggered(at date: Date) -> ActivityLog {
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: date,
+            type: .reminderTriggered,
+            activityDesc: "Reminder Triggered",
+            duration: 0,
+            dayContext: getDayContext(for: date)
+        )
+        addActivityLog(log)
+        return log
     }
 
     /// Logs when a reminder is responded to by the user.
@@ -174,5 +189,49 @@ class ActivityLogViewModel: ObservableObject {
             .filter { relevantTypes.contains($0.type) }
             .sorted { $0.timestamp > $1.timestamp }
             .first
+    }
+
+    /// Logs evaluation of a routine trigger and returns the created log.
+    func logTriggerEvaluation(trigger: RoutineTrigger, responded: Bool) -> ActivityLog {
+        let now = Date()
+        let desc = "Trigger evaluated: \(trigger.triggerType.label)\(trigger.exercise != nil ? " for \(trigger.exercise!.name)" : "")"
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .triggerEvaluation,
+            activityDesc: desc,
+            duration: 0,
+            dayContext: getDayContext(for: now),
+            triggerType: trigger.triggerType,
+            responded: responded
+        )
+        addActivityLog(log)
+        return log
+    }
+
+    /// Logs evaluation using just a TriggerType when full trigger is unavailable.
+    func logTriggerEvaluation(triggerType: TriggerType, responded: Bool, exerciseName: String? = nil) -> ActivityLog {
+        let now = Date()
+        let namePart = exerciseName.map { " for \($0)" } ?? ""
+        let desc = "Trigger evaluated: \(triggerType.label)\(namePart)"
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .triggerEvaluation,
+            activityDesc: desc,
+            duration: 0,
+            dayContext: getDayContext(for: now),
+            triggerType: triggerType,
+            responded: responded
+        )
+        addActivityLog(log)
+        return log
+    }
+
+    /// Marks a previously created trigger-evaluation log as responded.
+    func markTriggerLogResponded(logID: UUID) {
+        guard let idx = activityLogs.firstIndex(where: { $0.id == logID }) else { return }
+        activityLogs[idx].responded = true
+        updateActivityLog(activityLogs[idx])
     }
 }

@@ -8,8 +8,20 @@ struct RoutineDetailView: View {
 
     @State private var showExercisePicker = false
     @State private var triggerExercise: Exercise? = nil
-    @State private var editingTrigger: RoutineTrigger? = nil
-    @State private var showEditTrigger = false
+    // Holds both the trigger and its exercise for editing
+    @State private var editingContext: EditingTriggerContext? = nil
+
+    // Context for editing sheet to avoid empty sheet on first tap
+    struct EditingTriggerContext: Identifiable {
+        let id: UUID
+        let exercise: Exercise
+        let trigger: RoutineTrigger
+        init(exercise: Exercise, trigger: RoutineTrigger) {
+            self.id = trigger.id
+            self.exercise = exercise
+            self.trigger = trigger
+        }
+    }
 
     private func triggers(for exercise: Exercise) -> [RoutineTrigger] {
         routine.routineTriggers.filter { $0.exercise?.id == exercise.id }
@@ -87,8 +99,7 @@ struct RoutineDetailView: View {
                                         },
                                         onAddTrigger: { triggerExercise = ex },
                                         onEditTrigger: { trig in
-                                            editingTrigger = trig
-                                            showEditTrigger = true
+                                            editingContext = EditingTriggerContext(exercise: ex, trigger: trig)
                                         }
                                     )
                                 }
@@ -108,10 +119,8 @@ struct RoutineDetailView: View {
         .sheet(item: $triggerExercise) { ex in
             TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ex)
         }
-        .sheet(isPresented: $showEditTrigger, onDismiss: { editingTrigger = nil }) {
-            if let trig = editingTrigger, let ex = trig.exercise {
-                TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ex, trigger: trig)
-            }
+        .sheet(item: $editingContext) { ctx in
+            TriggerEditorView(routine: routine, routineViewModel: routineViewModel, exercise: ctx.exercise, trigger: ctx.trigger)
         }
     }
 }

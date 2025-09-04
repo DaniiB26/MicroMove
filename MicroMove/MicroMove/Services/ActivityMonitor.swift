@@ -7,7 +7,7 @@ class ActivityMonitor {
     private let activityLogViewModel: ActivityLogViewModel
     private let userPreferencesViewModel: UserPreferencesViewModel
     private let notificationService: NotificationServiceProtocol
-    private let reminderNotificationIdentifier = "movement-reminder"
+    private let reminderNotificationIdentifier = NotificationIdentifiers.movementReminder
 
     init(activityLogViewModel: ActivityLogViewModel, userPreferencesViewModel: UserPreferencesViewModel, notificationService: NotificationServiceProtocol = NotificationService()) {
         self.activityLogViewModel = activityLogViewModel
@@ -30,7 +30,8 @@ class ActivityMonitor {
     /// Call this after any user activity (exercise, app open, etc.)
     func resetInactivityReminder() {
         print("[ActivityMonitor] resetInactivityReminder called at \(Date())")
-        notificationService.removeNotifications(identifiers: [reminderNotificationIdentifier]) {
+        // Remove only pending reminders to avoid erasing delivered history
+        notificationService.removePending(identifiers: [reminderNotificationIdentifier]) {
             self.notificationService.getPendingRequests { requests in
                 print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
                 if !self.isInQuietHours() {
@@ -86,7 +87,8 @@ class ActivityMonitor {
     /// Checks inactivity and schedules a reminder if the user has been inactive for the full interval and it's not quiet hours.
     func checkAndScheduleReminder() {
         print("[ActivityMonitor] checkAndScheduleReminder called at \(Date())")
-        notificationService.removeNotifications(identifiers: [reminderNotificationIdentifier]) {
+        // Remove only pending reminders to avoid erasing delivered history
+        notificationService.removePending(identifiers: [reminderNotificationIdentifier]) {
             self.notificationService.getPendingRequests { requests in
                 print("[ActivityMonitor] Pending notifications after removal: \(requests.map { $0.identifier })")
                 if self.shouldSendReminder() {

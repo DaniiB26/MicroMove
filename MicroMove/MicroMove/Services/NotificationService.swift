@@ -9,6 +9,8 @@ protocol NotificationServiceProtocol {
     func scheduleNotification(identifier: String, content: UNNotificationContent, trigger: UNNotificationTrigger, completion: ((Error?) -> Void)?)
     /// Removes pending and delivered notifications with the given identifiers.
     func removeNotifications(identifiers: [String], completion: (() -> Void)?)
+    /// Removes only pending notifications with the given identifiers.
+    func removePending(identifiers: [String], completion: (() -> Void)?)
     /// Retrieves all pending notification requests.
     func getPendingRequests(completion: @escaping ([UNNotificationRequest]) -> Void)
 }
@@ -46,6 +48,10 @@ class NotificationService: NotificationServiceProtocol {
     func removeNotifications(identifiers: [String], completion: (() -> Void)?) {
         center.removePendingNotificationRequests(withIdentifiers: identifiers)
         center.removeDeliveredNotifications(withIdentifiers: identifiers)
+        completion?()
+    }
+    func removePending(identifiers: [String], completion: (() -> Void)?) {
+        center.removePendingNotificationRequests(withIdentifiers: identifiers)
         completion?()
     }
     func getPendingRequests(completion: @escaping ([UNNotificationRequest]) -> Void) {
