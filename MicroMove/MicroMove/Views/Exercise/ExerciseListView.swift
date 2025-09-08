@@ -16,14 +16,26 @@ struct ExerciseListView: View {
 
     private var displayedExercises: [Exercise] {
         if exerciseViewModel.selectedType == nil {
-            return progressViewModel.recentExercises(limit: 20, uniqueByExercise: true)
-            // let source = exerciseViewModel.exercises
-            // let prefs  = userPreferencesViewModel.userPreferences
-            // let recommended = (prefs != nil) ? exerciseViewModel.getRecommendedExercises(from: source, prefs: prefs!) : source
-            // return recommended
+            if let prefs = userPreferencesViewModel.userPreferences {
+                let source = exerciseViewModel.exercises
+                let recommended = exerciseViewModel.getRecommendedExercises(from: source, prefs: prefs)
+                // Apply the same duration sort toggle
+                return recommended.sorted {
+                    exerciseViewModel.isDurationAscending
+                        ? $0.duration < $1.duration
+                        : $0.duration > $1.duration
+                }
+            } else {
+                // Fallback: show all exercises sorted if no preferences yet
+                return exerciseViewModel.exercises
+            }
         } else {
             return exerciseViewModel.filteredAndSortedExercises
         }
+    }
+
+    private var headerTitle: String {
+        exerciseViewModel.selectedType == nil ? "RECOMMENDED WORKOUTS" : "WORKOUTS"
     }
 
     var body: some View {
@@ -31,7 +43,7 @@ struct ExerciseListView: View {
             VStack(spacing: 16) {
                 //TITLE
                 HStack {
-                    Text("RECENT WORKOUTS")
+                    Text(headerTitle)
                         .font(.custom("DotGothic16", size: 36))
                         .foregroundColor(.black)
                         .padding()
@@ -66,12 +78,20 @@ struct ExerciseListView: View {
                     VStack(spacing: 16) {
                         if displayedExercises.isEmpty {
                             Text(exerciseViewModel.selectedType == nil
-                                 ? "No recent workouts yet."
+                                 ? "No recommended exercises for your preferences."
                                  : "No exercises for this filter.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                                 .padding(.top, 8)
                         } else {
+                            // Show limited-options hint if recommendations are fewer than 3
+                            if exerciseViewModel.selectedType == nil && displayedExercises.count < 3 {
+                                Text("Limited options available for your selection. Try adjusting your level or goal.")
+                                    .font(.footnote)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
                             ForEach(displayedExercises, id: \.id) { exercise in
                                 NavigationLink(
                                     destination: ExerciseDetailView(

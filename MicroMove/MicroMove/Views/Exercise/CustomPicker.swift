@@ -11,8 +11,8 @@ struct CustomPicker: View {
                 Button(action: {
                     selectedType = type
                 }) {
-                    Text(type?.rawValue ?? "Recent")
-                        .font(.system(size: 14, weight: .regular))
+                    Text(type?.rawValue ?? "Suggested")
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundColor(selectedType == type ? .white : .black)
                         .padding(.vertical, 8)
                         .padding(.horizontal, 16)

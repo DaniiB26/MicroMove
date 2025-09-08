@@ -94,32 +94,20 @@ class ExercisesViewModel: ObservableObject {
     }
 
     func getRecommendedExercises(from all: [Exercise], prefs: UserPreferences) -> [Exercise] {
+        guard let goal = prefs.fitnessGoal, let level = prefs.fitnessLevel else {
+            return []
+        }
 
         let wantedType: ExerciseType = {
-            switch prefs.fitnessGoal {
-                case .strength:    return .strength
-                case .cardio,
-                     .endurance,
-                     .weightLoss: return .cardio
-                case .mobility:    return .stretch
-                case .none:
-                    return .cardio
-                }
-            } ()
+            switch goal {
+                case .strength: return .strength
+                case .cardio, .endurance, .weightLoss: return .cardio
+                case .mobility: return .stretch
+            }
+        } ()
 
-        var list = all.filter { $0.type == wantedType}
+        let list = all.filter { $0.type == wantedType && $0.difficulty.rawValue == level.rawValue }
 
-        switch prefs.fitnessLevel {
-            case .beginner:
-                list = list.filter { $0.duration <= 2 }
-            case .intermediate:
-                list = list.filter { $0.duration >= 3 && $0.duration <= 4 }
-            case .advanced:
-                list = list.filter { $0.duration >= 5 }
-            case .none:
-                list
-        }
-        
-        return list.sorted { $0.duration < $1.duration }
+        return list
     }
 }

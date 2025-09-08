@@ -14,6 +14,8 @@ final class Exercise {
     var type: ExerciseType
     /// Targeted body part.
     var bodyPart: BodyPart
+    /// Difficulty of the exercise
+    var difficulty: ExerciseDifficulty
     /// Duration in minutes.
     var duration: Int
     /// Date the exercise was created.
@@ -34,6 +36,7 @@ final class Exercise {
         exerciseDesc: String,
         type: ExerciseType,
         bodyPart: BodyPart,
+        difficulty: ExerciseDifficulty,
         duration: Int,
         createdAt: Date = Date(),
         isCompleted: Bool = false,
@@ -46,6 +49,7 @@ final class Exercise {
         self.exerciseDesc = exerciseDesc
         self.type = type
         self.bodyPart = bodyPart
+        self.difficulty = difficulty
         self.duration = duration
         self.createdAt = createdAt
         self.isCompleted = isCompleted

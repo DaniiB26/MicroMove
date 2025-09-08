@@ -15,6 +15,11 @@ enum ExerciseType: String, Codable, CaseIterable {
     }
 }
 
+enum ExerciseDifficulty: String, Codable, CaseIterable {
+    case beginner, intermediate, advanced
+    var id: String { rawValue.capitalized }
+    var display: String { rawValue.capitalized }
+}
 
 /// Represents the target body part of an exercise
 enum BodyPart: String, Codable, CaseIterable {

@@ -18,6 +18,8 @@ struct ContentView: View {
     @State private var routineNotificationCoordinator: RoutineNotificationCoordinator? = nil
     @State private var showAchievementBanner = false
     @State private var bannerAchievement: Achievement?
+    @State private var showOnboarding = false
+    @State private var initialTab: BottomTabBar.Tab = .home
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -32,21 +34,6 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .top) {
-
-            BottomTabBar(
-                modelContext: modelContext,
-                progressViewModel: progressViewModel,
-                userPreferencesViewModel: userPreferencesViewModel,
-                activityLogViewModel: activityLogViewModel,
-                workoutSessionViewModel: workoutSessionViewModel,
-                achievementsViewModel: achievementsViewModel,
-                routineViewModel: routineViewModel,
-                exercisesViewModel: exercisesViewModel,
-                activityMonitor: activityMonitor
-            )
-
-
             // NavigationStack {
             //     VStack(spacing: 16) {
             //         HomeView(progressViewModel: progressViewModel)
@@ -162,6 +149,34 @@ struct ContentView: View {
             //         .accessibilityLabel("Test Achievement Banner")
             //     }
             // }
+        Group {
+            if showOnboarding {
+                NavigationStack {
+                    OnBoardingPage(
+                        userPreferencesViewModel: userPreferencesViewModel,
+                        exercisesViewModel: exercisesViewModel
+                    ) {
+                        // On first completion of onboarding, show Workouts tab
+                        initialTab = .workouts
+                        showOnboarding = false
+                    }
+                }
+            } else {
+                ZStack(alignment: .top) {
+                    BottomTabBar(
+                        modelContext: modelContext,
+                        progressViewModel: progressViewModel,
+                        userPreferencesViewModel: userPreferencesViewModel,
+                        activityLogViewModel: activityLogViewModel,
+                        workoutSessionViewModel: workoutSessionViewModel,
+                        achievementsViewModel: achievementsViewModel,
+                        routineViewModel: routineViewModel,
+                        exercisesViewModel: exercisesViewModel,
+                        activityMonitor: activityMonitor,
+                        initialTab: initialTab
+                    )
+                }
+            }
         }
         .onAppear {
             if activityMonitor == nil {
@@ -197,6 +212,8 @@ struct ContentView: View {
                 appDelegate.activityMonitor = activityMonitor
                 appDelegate.routineNotificationCoordinator = routineNotificationCoordinator
             }
+            userPreferencesViewModel.fetchUserPreferences()
+            showOnboarding = userPreferencesViewModel.userPreferences == nil
         }
         // .onReceive(progressViewModel.$lastUnlockedAchievement) { achievement in
         //     if let achievement = achievement {

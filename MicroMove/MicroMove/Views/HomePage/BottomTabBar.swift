@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 struct BottomTabBar: View {
+    enum Tab: Hashable { case home, workouts, achievements, activity }
     let modelContext: ModelContext
     @ObservedObject var progressViewModel: ProgressViewModel
     @ObservedObject var userPreferencesViewModel: UserPreferencesViewModel
@@ -11,9 +12,34 @@ struct BottomTabBar: View {
     @ObservedObject var routineViewModel: RoutineViewModel
     @ObservedObject var exercisesViewModel: ExercisesViewModel
     var activityMonitor: ActivityMonitor?
+    @State private var selectedTab: Tab
+
+    init(
+        modelContext: ModelContext,
+        progressViewModel: ProgressViewModel,
+        userPreferencesViewModel: UserPreferencesViewModel,
+        activityLogViewModel: ActivityLogViewModel,
+        workoutSessionViewModel: WorkoutSessionViewModel,
+        achievementsViewModel: AchievementsViewModel,
+        routineViewModel: RoutineViewModel,
+        exercisesViewModel: ExercisesViewModel,
+        activityMonitor: ActivityMonitor?,
+        initialTab: Tab = .home
+    ) {
+        self.modelContext = modelContext
+        self._progressViewModel = ObservedObject(wrappedValue: progressViewModel)
+        self._userPreferencesViewModel = ObservedObject(wrappedValue: userPreferencesViewModel)
+        self._activityLogViewModel = ObservedObject(wrappedValue: activityLogViewModel)
+        self._workoutSessionViewModel = ObservedObject(wrappedValue: workoutSessionViewModel)
+        self._achievementsViewModel = ObservedObject(wrappedValue: achievementsViewModel)
+        self._routineViewModel = ObservedObject(wrappedValue: routineViewModel)
+        self._exercisesViewModel = ObservedObject(wrappedValue: exercisesViewModel)
+        self.activityMonitor = activityMonitor
+        self._selectedTab = State(initialValue: initialTab)
+    }
 
     var body: some View {
-        TabView {
+        TabView(selection: $selectedTab) {
             // Home tab
             NavigationStack {
                     ZStack {
@@ -31,6 +57,7 @@ struct BottomTabBar: View {
             .tabItem {
                 Label("Home", systemImage: "house")
             }
+            .tag(Tab.home)
 
             // Workouts tab
             NavigationStack {
@@ -49,6 +76,7 @@ struct BottomTabBar: View {
             .tabItem {
                 Label("Workouts", systemImage: "dumbbell")
             }
+            .tag(Tab.workouts)
 
             // Achievements tab
             // NavigationStack {
@@ -65,6 +93,7 @@ struct BottomTabBar: View {
             .tabItem {
                 Label("Achievements", systemImage: "medal")
             }
+            .tag(Tab.achievements)
 
             // Activity Log tab
             ActivityListView(
@@ -73,6 +102,7 @@ struct BottomTabBar: View {
             .tabItem {
                 Label("Activity", systemImage: "clock")
             }
+            .tag(Tab.activity)
         }
         .accentColor(.black)
     }
