@@ -8,6 +8,8 @@ struct ExerciseDetailView: View {
     @ObservedObject var exerciseViewModel: ExercisesViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
     @State private var showTimer = false
+    @State private var showWeight = false
+    @State private var showReps = false
     @State private var currentGuideIndex = 0
     @State private var showGuide = false
     var activityMonitor: ActivityMonitor? = nil
@@ -95,7 +97,13 @@ struct ExerciseDetailView: View {
             HStack(spacing: 12) {
                 Button {
                     activityLogViewModel.addExerciseStart(exercise: exercise)
-                    showTimer = true
+                    if exercise.supportsWeight {
+                        showWeight = true
+                    }
+                    else if exercise.supportsReps {
+                        showReps = true
+                    }
+                    else {showTimer = true}
                 } label: {
                     Text("Start")
                         .frame(maxWidth: .infinity)
@@ -119,6 +127,26 @@ struct ExerciseDetailView: View {
         }
         .navigationDestination(isPresented: $showTimer) {
             TimerView(
+                exercise: exercise,
+                activityLogViewModel: activityLogViewModel,
+                workoutSessionViewModel: workoutSessionViewModel,
+                activityMonitor: activityMonitor,
+                exerciseViewModel: exerciseViewModel,
+                progressViewModel: progressViewModel
+            )
+        }
+        .navigationDestination(isPresented: $showReps) {
+            RepsView(
+                exercise: exercise,
+                activityLogViewModel: activityLogViewModel,
+                workoutSessionViewModel: workoutSessionViewModel,
+                activityMonitor: activityMonitor,
+                exerciseViewModel: exerciseViewModel,
+                progressViewModel: progressViewModel
+            )
+        }
+        .navigationDestination(isPresented: $showWeight) {
+            WeightView(
                 exercise: exercise,
                 activityLogViewModel: activityLogViewModel,
                 workoutSessionViewModel: workoutSessionViewModel,

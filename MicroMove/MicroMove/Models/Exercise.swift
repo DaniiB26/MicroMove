@@ -28,6 +28,12 @@ final class Exercise {
     var instructions: [String] = []
     /// Visual guide for the exercise.
     var visualGuide: [String] = []
+    /// Optional weight input
+    var supportsWeight: Bool
+    /// Optional reps
+    var supportsReps: Bool
+    /// Optional Timer
+    var supportsTimer: Bool
 
     /// Initializes a new Exercise.
     init(
@@ -42,7 +48,10 @@ final class Exercise {
         isCompleted: Bool = false,
         image: String,
         instructions: [String],
-        visualGuide: [String]
+        visualGuide: [String],
+        supportsReps: Bool,
+        supportsWeight: Bool,
+        supportsTimer: Bool
     ) {
         self.id = id
         self.name = name
@@ -56,5 +65,8 @@ final class Exercise {
         self.image = image
         self.instructions = instructions
         self.visualGuide = visualGuide
+        self.supportsReps = supportsReps
+        self.supportsWeight = supportsWeight
+        self.supportsTimer = supportsTimer
     }
 }

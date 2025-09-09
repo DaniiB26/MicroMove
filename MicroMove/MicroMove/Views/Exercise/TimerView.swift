@@ -1,29 +1,55 @@
 import SwiftUI
 
 struct TimerView: View {
-    @State private var isRunning = true
+    // ViewModels
     @ObservedObject var activityLogViewModel: ActivityLogViewModel
     @ObservedObject var workoutSessionViewModel: WorkoutSessionViewModel
     @ObservedObject var exerciseViewModel: ExercisesViewModel
     @ObservedObject var progressViewModel: ProgressViewModel
-    @State private var timer: Timer?
-    @Environment(\.dismiss) private var dismiss
-    @State private var timeRemaining: Int
-    let exercise: Exercise
-    var activityMonitor: ActivityMonitor? // Optional ActivityMonitor for notification reset
 
-    init(exercise: Exercise, activityLogViewModel: ActivityLogViewModel, workoutSessionViewModel: WorkoutSessionViewModel, activityMonitor: ActivityMonitor? = nil, exerciseViewModel: ExercisesViewModel, progressViewModel: ProgressViewModel) {
+    // Data
+    let exercise: Exercise
+    var activityMonitor: ActivityMonitor?
+
+    // Timer state
+    @State private var isRunning = true
+    @State private var timer: Timer?
+    @State private var endedEarly = false
+    @State private var startDate = Date()
+    @State private var timeRemaining: Int
+    @State private var didComplete = false
+
+    @Environment(\.dismiss) private var dismiss
+
+    private var totalSeconds: Int { exercise.duration * 60 }
+    private var progress: CGFloat {
+        guard totalSeconds > 0 else { return 1 }
+        return CGFloat(max(0, totalSeconds - timeRemaining)) / CGFloat(totalSeconds)
+    }
+
+    init(
+        exercise: Exercise,
+        activityLogViewModel: ActivityLogViewModel,
+        workoutSessionViewModel: WorkoutSessionViewModel,
+        activityMonitor: ActivityMonitor? = nil,
+        exerciseViewModel: ExercisesViewModel,
+        progressViewModel: ProgressViewModel
+    ) {
         self.exercise = exercise
         self.activityLogViewModel = activityLogViewModel
         self.workoutSessionViewModel = workoutSessionViewModel
         self.activityMonitor = activityMonitor
         self.exerciseViewModel = exerciseViewModel
         self.progressViewModel = progressViewModel
-        self._timeRemaining = State(initialValue: exercise.duration * 60) // Convert minutes to seconds
+        _timeRemaining = State(initialValue: exercise.duration * 60)
     }
 
-    func startTimer() {
+    // MARK: - Timer control
+
+    private func startTimer() {
+        guard timer == nil else { return }
         isRunning = true
+        startDate = Date()
         timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             if timeRemaining > 0 {
                 timeRemaining -= 1
@@ -32,90 +58,164 @@ struct TimerView: View {
                 completeExercise()
             }
         }
+        RunLoop.main.add(timer!, forMode: .common)
     }
-    
-    func stopTimer() {
+
+    private func stopTimer() {
         timer?.invalidate()
         timer = nil
         isRunning = false
     }
-    
-    func completeExercise() {
-        // Log the completed exercise
+
+    private func completeExercise() {
+        guard !didComplete else { return }
+        didComplete = true
+
+        let now = Date()
+        let timeSpent = Int(now.timeIntervalSince(startDate))
+
         activityLogViewModel.addExerciseComplete(exercise: exercise)
-        workoutSessionViewModel.addExerciseToSession(exercise: exercise)
+        workoutSessionViewModel.addTimedExercise(exercise: exercise,
+                                                 timeSpent: max(0, timeSpent),
+                                                 endedEarly: endedEarly)
         progressViewModel.refreshProgress()
-        // Reset the reminder notification schedule after exercise completion
         activityMonitor?.resetInactivityReminder()
-        // Mark the exercise as done
         exerciseViewModel.markExerciseAsDone(exercise)
-        // Navigate back to exercise detail view
         dismiss()
     }
-    
+
+    // MARK: - UI
+
     var body: some View {
-        VStack(spacing: 30) {
-            // Exercise info
-            VStack(spacing: 16) {
-                Text(exercise.name)
-                    .font(.title)
-                    .bold()
-                
-                Text("Duration: \(exercise.duration) minutes")
-                    .font(.headline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            // Timer display
-            VStack(spacing: 20) {
-                Text("Time Remaining")
-                    .font(.title2)
-                    .foregroundColor(.secondary)
-                
-                Text(timeString(from: timeRemaining))
-                    .font(.system(size: 60, weight: .bold, design: .monospaced))
-                    .foregroundColor(isRunning ? .primary : .green)
-            }
-            
-            Spacer()
-            
-            // Control buttons
-            VStack(spacing: 16) {
-                if isRunning {
-                    Button("Cancel Exercise") {
-                        stopTimer()
-                        dismiss()
+        ZStack {
+            Color(.systemGray6).ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 16) {
+
+                    // Header
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(exercise.name)
+                                .font(.title.bold())
+                                .foregroundColor(.primary)
+                            Text("Duration: \(exercise.duration) min")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "timer")
+                            .font(.title2)
+                            .foregroundColor(.black)
+                            .padding(10)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.black.opacity(0.06), lineWidth: 1)
+                            )
                     }
-                    .foregroundColor(.red)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.red.opacity(0.1))
-                    .cornerRadius(8)
-                } else {
-                    Text("Exercise Complete!")
-                        .font(.title2)
-                        .foregroundColor(.green)
-                        .bold()
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+
+                    // Timer Card with circular progress
+                    Panel {
+                        VStack(spacing: 18) {
+                            Text("Time Remaining")
+                                .font(.headline)
+
+                            ZStack {
+                                // Track
+                                Circle()
+                                    .stroke(Color.black.opacity(0.08), lineWidth: 16)
+
+                                // Progress
+                                Circle()
+                                    .trim(from: 0, to: progress)
+                                    .stroke(
+                                        Color.black,
+                                        style: StrokeStyle(lineWidth: 16, lineCap: .round, lineJoin: .round)
+                                    )
+                                    .rotationEffect(.degrees(-90))
+                                    .animation(.linear(duration: 0.2), value: progress)
+
+                                // Time text
+                                Text(timeString(from: timeRemaining))
+                                    .font(.system(size: 44, weight: .bold, design: .monospaced))
+                            }
+                            .frame(width: 200, height: 200)
+
+                            // Status text
+                            Text(isRunning ? "Keep going…" : (timeRemaining == 0 ? "Done!" : "Paused"))
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+
+                    // Controls card
+                    Panel {
+                        HStack(spacing: 12) {
+                            //Pause Button
+                            Button {
+                                if isRunning {
+                                    stopTimer()
+                                } else {
+                                    startTimer()
+                                }
+                            } label: {
+                                Label(isRunning ? "Pause" : "Resume", systemImage: isRunning ? "pause.fill" : "play.fill")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(SecondarySoftButton())
+
+                            Button(role: .destructive) {
+                                endedEarly = true
+                                stopTimer()
+                                completeExercise()
+                            } label: {
+                                Label("End Early", systemImage: "xmark.circle")
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(SecondarySoftButton())
+                        }
+                    }
+
+                    Spacer(minLength: 80)
                 }
+                .padding(.vertical, 12)
             }
         }
-        .padding()
         .navigationTitle("Exercise Timer")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .onAppear {
-            startTimer()
-        }
-        .onDisappear {
-            stopTimer()
-        }
+        .onAppear { startTimer() }
+        .onDisappear { stopTimer() }
     }
-    
-    // Helper function to format time as MM:SS
+
+    // MARK: - Helpers
+
     private func timeString(from seconds: Int) -> String {
-        let minutes = seconds / 60
-        let remainingSeconds = seconds % 60
-        return String(format: "%02d:%02d", minutes, remainingSeconds)
+        let m = seconds / 60
+        let s = seconds % 60
+        return String(format: "%02d:%02d", m, s)
+    }
+}
+
+// Simple reusable white panel with subtle border
+private struct Panel<Content: View>: View {
+    @ViewBuilder var content: Content
+    var body: some View {
+        VStack(alignment: .center, spacing: 12) {
+            content
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+        )
+        .padding(.horizontal, 16)
     }
 }

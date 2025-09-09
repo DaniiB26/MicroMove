@@ -41,7 +41,7 @@ struct WorkoutHistoryView: View {
                                                     Text("Duration")
                                                         .font(.caption)
                                                         .foregroundColor(.secondary)
-                                                    Text("\(exercise.duration) min")
+                                                    Text("\(exerciseDTO.duration / 60) min")
                                                         .font(.subheadline)
                                                         .foregroundColor(.primary)
                                                 }
@@ -63,7 +63,40 @@ struct WorkoutHistoryView: View {
                                                         .font(.subheadline)
                                                         .foregroundColor(.primary)
                                                 }
-                                            } 
+
+                                                if let reps = exerciseDTO.reps {
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text("Reps")
+                                                            .font(.caption)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(reps)")
+                                                            .font(.subheadline)
+                                                            .foregroundColor(.primary)
+                                                    }
+                                                }
+
+                                                if let weight = exerciseDTO.weight {
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text("Weight")
+                                                            .font(.caption)
+                                                            .foregroundColor(.secondary)
+                                                        Text("\(weight) kg")
+                                                            .font(.subheadline)
+                                                            .foregroundColor(.primary)
+                                                    }
+                                                }
+
+                                                if exercise.supportsTimer {
+                                                    VStack(alignment: .leading, spacing: 2) {
+                                                        Text("Ended Early")
+                                                            .font(.caption)
+                                                            .foregroundColor(.secondary)
+                                                        Text(exerciseDTO.endedEarly ? "Yes" : "No")
+                                                            .font(.subheadline)
+                                                            .foregroundColor(.primary)
+                                                    }
+                                                }
+                                            }
                                         }
                                         Spacer()
                                     }

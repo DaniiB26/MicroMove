@@ -59,55 +59,76 @@ class WorkoutSessionViewModel: ObservableObject {
     }
 
     /// Adds an exercise to today's workout session, or creates a new session if none exists.
-    func addExerciseToSession(exercise: Exercise) {
+    func addExerciseToSession(exerciseDTO: ExerciseDTO) {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
+        let durationMinutes = exerciseDTO.duration / 60
 
-        let todaySession = workoutSessions.first(where: { calendar.isDate($0.date, inSameDayAs: today) })
+        let todaySession = workoutSessions.first { calendar.isDate($0.date, inSameDayAs: today) }
 
-        let now = Date()
         if let session = todaySession {
-            let dto = ExerciseDTO(baseExercise: exercise, startedAt: now, completedAt: now + TimeInterval(exercise.duration * 60))
-            session.exercises.append(dto)
-            session.duration += exercise.duration
+            session.exercises.append(exerciseDTO)
+            session.duration += durationMinutes
             if session.startedAt == nil {
-                session.startedAt = now
+                session.startedAt = exerciseDTO.startedAt
             }
-            session.completedAt = now + TimeInterval(exercise.duration * 60)
+            session.completedAt = exerciseDTO.completedAt
             updateWorkoutSession(session)
-            do {
-                try modelContext.save()
-                // print("[WorkoutSessionViewModel] Updated today's session:")
-                // print("  Date: \(session.date)")
-                // print("  Exercises: \(session.exercises.map { $0.name }) (\(session.exercises.count) total)")
-                // print("  Duration: \(session.duration) min")
-                // print("  StartedAt: \(String(describing: session.startedAt))")
-                // print("  CompletedAt: \(String(describing: session.completedAt))")
-            } catch {
-                print("[WorkoutSessionViewModel] Error saving updated session: \(error)")
-            }
         } else {
-            let completedAt = now + TimeInterval(exercise.duration * 60)
-            let dto = ExerciseDTO(baseExercise: exercise, startedAt: now, completedAt: now + TimeInterval(exercise.duration * 60))
             let newSession = WorkoutSession(
                 date: today,
-                duration: exercise.duration,
-                exercises: [dto],
-                startedAt: now,
-                completedAt: completedAt
+                duration: durationMinutes,
+                exercises: [exerciseDTO],
+                startedAt: exerciseDTO.startedAt,
+                completedAt: exerciseDTO.completedAt
             )
             addWorkoutSession(newSession)
             do {
                 try modelContext.save()
-                // print("[WorkoutSessionViewModel] Created new session for today:")
-                // print("  Date: \(newSession.date)")
-                // print("  Exercises: \(newSession.exercises.map { $0.name }) (1 total)")
-                // print("  Duration: \(newSession.duration) min")
-                // print("  StartedAt: \(String(describing: newSession.startedAt))")
-                // print("  CompletedAt: \(String(describing: newSession.completedAt))")
             } catch {
                 print("[WorkoutSessionViewModel] Error saving new session: \(error)")
             }
         }
+    }
+
+    // Adds a repetition-based exercise to the current session.
+    func addRepsExercise(exercise: Exercise, reps: Int) {
+        let now = Date()
+        let durationSeconds = exercise.duration * 60
+        let dto = ExerciseDTO (
+            baseExercise: exercise,
+            startedAt: now,
+            completedAt: now + TimeInterval(durationSeconds),
+            duration: durationSeconds,
+            reps: reps
+        )
+        addExerciseToSession(exerciseDTO: dto)
+    }
+
+    // Adds a weight-based exercise to the current session.
+    func addWeightExercise(exercise: Exercise, weight: Int) {
+        let now = Date()
+        let durationSeconds = exercise.duration * 60
+        let dto = ExerciseDTO(
+            baseExercise: exercise,
+            startedAt: now,
+            completedAt: now + TimeInterval(durationSeconds),
+            duration: durationSeconds,
+            weight: weight
+        )
+        addExerciseToSession(exerciseDTO: dto)
+    }
+
+    // Adds a timed exercise to the current session, capturing actual time spent and whether it ended early.
+    func addTimedExercise(exercise: Exercise, timeSpent: Int, endedEarly: Bool) {
+        let now = Date()
+        let dto = ExerciseDTO(
+            baseExercise: exercise,
+            startedAt: now - TimeInterval(timeSpent),
+            completedAt: now,
+            duration: timeSpent,
+            endedEarly: endedEarly
+        )
+        addExerciseToSession(exerciseDTO: dto)
     }
 }
