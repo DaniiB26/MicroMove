@@ -88,7 +88,7 @@ struct WeightView: View {
                     .padding(.top, 8)
 
                     // Weight card
-                    Panel {
+                    Card {
                         VStack(alignment: .leading, spacing: 14) {
                             Text("Weight")
                                 .font(.headline)
@@ -163,67 +163,5 @@ struct WeightView: View {
             .background(.ultraThinMaterial)
         }
         .onAppear { weightFieldFocused = true }
-    }
-}
-
-// MARK: - Small Reusable Pieces
-
-private struct Panel<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            content
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.black.opacity(0.06), lineWidth: 1)
-        )
-        .padding(.horizontal, 16)
-    }
-}
-
-private struct RoundIconButton: View {
-    let systemName: String
-    let action: () -> Void
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.title3.weight(.semibold))
-                .frame(width: 44, height: 44)
-                .background(Color(.systemGray6))
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.black.opacity(0.08), lineWidth: 1))
-                .foregroundColor(.primary)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct Chip: View {
-    let title: String
-    let action: () -> Void
-    init(_ title: String, action: @escaping () -> Void) {
-        self.title = title
-        self.action = action
-    }
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .padding(.vertical, 6)
-                .padding(.horizontal, 10)
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
-                )
-                .foregroundColor(.primary)
-        }
-        .buttonStyle(.plain)
     }
 }

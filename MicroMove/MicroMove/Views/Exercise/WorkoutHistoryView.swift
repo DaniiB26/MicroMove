@@ -36,7 +36,7 @@ struct WorkoutHistoryView: View {
                                                 .font(.headline)
                                                 .foregroundColor(.primary)
 
-                                            HStack(spacing: 24) {
+                                            HStack(spacing: 20) {
                                                 VStack(alignment: .leading, spacing: 2) {
                                                     Text("Duration")
                                                         .font(.caption)

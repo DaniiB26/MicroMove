@@ -119,7 +119,7 @@ struct TimerView: View {
                     .padding(.top, 8)
 
                     // Timer Card with circular progress
-                    Panel {
+                    Card {
                         VStack(spacing: 18) {
                             Text("Time Remaining")
                                 .font(.headline)
@@ -143,7 +143,8 @@ struct TimerView: View {
                                 Text(timeString(from: timeRemaining))
                                     .font(.system(size: 44, weight: .bold, design: .monospaced))
                             }
-                            .frame(width: 200, height: 200)
+                            .frame(maxWidth: .infinity)
+                            .aspectRatio(1, contentMode: .fit)
 
                             // Status text
                             Text(isRunning ? "Keep going…" : (timeRemaining == 0 ? "Done!" : "Paused"))
@@ -153,7 +154,7 @@ struct TimerView: View {
                     }
 
                     // Controls card
-                    Panel {
+                    Card {
                         HStack(spacing: 12) {
                             //Pause Button
                             Button {
@@ -179,6 +180,7 @@ struct TimerView: View {
                             .buttonStyle(SecondarySoftButton())
                         }
                     }
+                    .frame(maxWidth: .infinity) 
 
                     Spacer(minLength: 80)
                 }
@@ -198,24 +200,5 @@ struct TimerView: View {
         let m = seconds / 60
         let s = seconds % 60
         return String(format: "%02d:%02d", m, s)
-    }
-}
-
-// Simple reusable white panel with subtle border
-private struct Panel<Content: View>: View {
-    @ViewBuilder var content: Content
-    var body: some View {
-        VStack(alignment: .center, spacing: 12) {
-            content
-        }
-        .padding(16)
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.black.opacity(0.06), lineWidth: 1)
-        )
-        .padding(.horizontal, 16)
     }
 }
