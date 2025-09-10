@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import UserNotifications
 
 @MainActor
 class ProgressViewModel: ObservableObject {
@@ -15,11 +16,18 @@ class ProgressViewModel: ObservableObject {
 
     private var modelContext: ModelContext
     private var achievementsViewModel: AchievementsViewModel
+    private var activityLogViewModel: ActivityLogViewModel
 
-    init(modelContext: ModelContext, achievementsViewModel: AchievementsViewModel) {
+    init(modelContext: ModelContext, achievementsViewModel: AchievementsViewModel, activityLogViewModel: ActivityLogViewModel) {
         self.modelContext = modelContext
         self.achievementsViewModel = achievementsViewModel
+        self.activityLogViewModel = activityLogViewModel
         refreshProgress()
+    }
+
+    convenience init(modelContext: ModelContext, achievementsViewModel: AchievementsViewModel) {
+        let activityLogVM = ActivityLogViewModel(modelContext: modelContext)
+        self.init(modelContext: modelContext, achievementsViewModel: achievementsViewModel, activityLogViewModel: activityLogVM)
     }
 
     func fetchWorkoutSessions() {
@@ -123,7 +131,7 @@ class ProgressViewModel: ObservableObject {
             let requirementMet: Bool
             switch achievement.type {
             case .streak:
-                requirementMet = currentStreak >= achievement.requirement
+                requirementMet = max(currentStreak, longestStreak) >= achievement.requirement
             case .totalExercises:
                 requirementMet = totalExercises >= achievement.requirement
             case .totalMinutes:
@@ -146,6 +154,20 @@ class ProgressViewModel: ObservableObject {
                     self.lastUnlockedAchievement = nil
                 }
             }
+
+            let content = UNMutableNotificationContent()
+            content.title = "Achievement Unlocked!"
+            content.body = "\(unlocked.title): \(unlocked.achievementDesc)"
+            content.sound = .default
+            let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 1, repeats: false)
+            let service = NotificationService()
+            service.scheduleNotification(identifier: NotificationIdentifiers.achievementUnlocked, content: content, trigger: trigger) { error in
+                if let error = error {
+                    print("[ProgressViewModel] Failed to schedule achievement notification: \(error.localizedDescription)")
+                }
+            }
+
+            activityLogViewModel.addAchievementUnlocked(achievement: unlocked)
         }
     }
 

@@ -6,6 +6,8 @@ enum NotificationIdentifiers {
     static let movementReminder = "movement-reminder"
     /// Identifier used for weekly check-in reminders.
     static let weeklyCheckIn = "weekly-check-in"
+    /// Identifier used for achievement unlocked notifications.
+    static let achievementUnlocked = "achievement-unlocked"
     /// Prefix used for grouping notifications per trigger in Notification Center.
     static let triggerThreadPrefix = "trigger-"
 }
@@ -15,4 +17,3 @@ enum NotificationUserInfoKeys {
     static let triggerID = "triggerID"
     static let triggerType = "triggerType"
 }
-
