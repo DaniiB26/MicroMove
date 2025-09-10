@@ -30,6 +30,7 @@ final class ActivityLog {
         case reminderResponded
         case inactivityDetected
         case triggerEvaluation
+        case achievementUnlocked
 
         /// A more human-friendly label for UI
         var displayName: String {
@@ -48,6 +49,8 @@ final class ActivityLog {
                 return "Inactivity Detected"
             case .triggerEvaluation:
                 return "Trigger Evaluated"
+            case .achievementUnlocked:
+                return "Achievement Unlocked"
             }
         }
     }

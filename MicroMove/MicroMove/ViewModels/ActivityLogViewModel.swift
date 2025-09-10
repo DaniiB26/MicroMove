@@ -168,6 +168,21 @@ class ActivityLogViewModel: ObservableObject {
         addActivityLog(log)
     }
 
+    /// Logs when an achievement is unlocked.
+    func addAchievementUnlocked(achievement: Achievement) -> ActivityLog {
+        let now = Date()
+        let log = ActivityLog(
+            id: UUID(),
+            timestamp: now,
+            type: .achievementUnlocked,
+            activityDesc: "Achievement Unlocked: \(achievement.title)",
+            duration: 0,
+            dayContext: getDayContext(for: now)
+        )
+        addActivityLog(log)
+        return log
+    }
+
     /// Logs when inactivity is detected.
     func addInactivityDetected(inactiveTime: TimeInterval) {
         let now = Date()

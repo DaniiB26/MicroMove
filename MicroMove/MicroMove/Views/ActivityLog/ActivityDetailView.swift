@@ -69,6 +69,7 @@ struct ActivityDetailView: View {
         case .reminderResponded: return "bell.fill"
         case .inactivityDetected: return "zzz"
         case .triggerEvaluation:  return "bell.badge"
+        case .achievementUnlocked: return "medal.fill"
         }
     }
 }

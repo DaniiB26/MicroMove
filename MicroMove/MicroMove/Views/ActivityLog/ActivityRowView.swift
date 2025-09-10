@@ -55,6 +55,7 @@ struct ActivityRowView: View {
         case .reminderResponded:  return "bell.badge.fill"
         case .inactivityDetected: return "zzz"
         case .triggerEvaluation:  return "bell.badge"
+        case .achievementUnlocked: return "medal.fill"
         }
     }
 
@@ -67,6 +68,7 @@ struct ActivityRowView: View {
         case .reminderResponded:  return .indigo
         case .inactivityDetected: return .gray
         case .triggerEvaluation:  return .teal
+        case .achievementUnlocked: return .yellow
         }
     }
 }
