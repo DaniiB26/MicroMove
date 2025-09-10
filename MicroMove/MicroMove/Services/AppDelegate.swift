@@ -6,6 +6,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     var activityLogViewModel: ActivityLogViewModel?
     var activityMonitor: ActivityMonitor?
     var routineNotificationCoordinator: RoutineNotificationCoordinator?
+    // Callback used to present the Weekly Check-In UI when tapped.
+    var onWeeklyCheckInRequested: (() -> Void)?
     // Map of unique occurrence key -> logID. Key format: "<identifier>|<deliveryTime>"
     private var routineLogIDsByOccurrenceKey: [String: UUID] = [:]
 
@@ -81,6 +83,12 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 print("[AppDelegate] User responded to movement reminder")
                 // Chain next reminder if still inactive
                 self.activityMonitor?.handlePossibleContinuedInactivity()
+            }
+        } else if identifier == NotificationIdentifiers.weeklyCheckIn {
+            // Route to Weekly Check-In flow
+            DispatchQueue.main.async {
+                self.onWeeklyCheckInRequested?()
+                print("[AppDelegate] Weekly Check-In notification tapped; requested UI presentation")
             }
         } else if let trigger = routineNotificationCoordinator?.trigger(forNotificationIdentifier: identifier) {
             if let logID = routineLogIDsByOccurrenceKey[occurrenceKey] {

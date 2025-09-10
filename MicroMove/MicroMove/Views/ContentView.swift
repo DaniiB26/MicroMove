@@ -16,9 +16,11 @@ struct ContentView: View {
     @StateObject private var exercisesViewModel: ExercisesViewModel
     @State private var activityMonitor: ActivityMonitor? = nil
     @State private var routineNotificationCoordinator: RoutineNotificationCoordinator? = nil
+    @State private var checkInScheduler: CheckInScheduler? = nil
     @State private var showAchievementBanner = false
     @State private var bannerAchievement: Achievement?
     @State private var showOnboarding = false
+    @State private var showWeeklyCheckIn = false
     @State private var initialTab: BottomTabBar.Tab = .home
 
     init(modelContext: ModelContext) {
@@ -176,6 +178,21 @@ struct ContentView: View {
                         initialTab: initialTab
                     )
                 }
+                .overlay(alignment: .bottomTrailing) {
+                    Button {
+                        showWeeklyCheckIn = true
+                    } label: {
+                        Image(systemName: "questionmark.circle.fill")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(12)
+                            .background(Circle().fill(Color.black.opacity(0.8)))
+                            .shadow(radius: 4)
+                    }
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                    .accessibilityLabel("Show Weekly Check-In Now")
+                }
             }
         }
         .onAppear {
@@ -198,6 +215,10 @@ struct ContentView: View {
                     self.routineNotificationCoordinator?.scheduleAllTriggers()
                 }
             }
+            if checkInScheduler == nil {
+                checkInScheduler = CheckInScheduler()
+                checkInScheduler?.scheduleNextCheckIn()
+            }
             if !Self.hasLoggedAppOpen {
                 activityLogViewModel.addAppOpen()
                 Self.hasLoggedAppOpen = true
@@ -211,9 +232,17 @@ struct ContentView: View {
                 appDelegate.activityLogViewModel = activityLogViewModel
                 appDelegate.activityMonitor = activityMonitor
                 appDelegate.routineNotificationCoordinator = routineNotificationCoordinator
+                appDelegate.onWeeklyCheckInRequested = { showWeeklyCheckIn = true }
             }
             userPreferencesViewModel.fetchUserPreferences()
             showOnboarding = userPreferencesViewModel.userPreferences == nil
+        }
+        .sheet(isPresented: $showWeeklyCheckIn) {
+            WeeklyCheckInPrompt(userPreferencesViewModel: userPreferencesViewModel) {
+                // After completing, schedule the next check-in and dismiss
+                checkInScheduler?.handleCheckInCompleted()
+                showWeeklyCheckIn = false
+            }
         }
         // .onReceive(progressViewModel.$lastUnlockedAchievement) { achievement in
         //     if let achievement = achievement {
