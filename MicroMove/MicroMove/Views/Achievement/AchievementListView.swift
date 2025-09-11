@@ -3,6 +3,7 @@ import SwiftUI
 struct AchievementListView: View {
     @Environment(\.modelContext) private var modelContext
     @ObservedObject var viewModel: AchievementsViewModel
+    @ObservedObject var progressViewModel: ProgressViewModel
 
     func addDemoAchievements() {
         let streaks = [3, 7, 14, 30, 100]
@@ -24,49 +25,51 @@ struct AchievementListView: View {
             viewModel.deleteAchievement(achievement)
         }
     }
-
     var body: some View {
-       NavigationStack {
-            let sortedAchievements = viewModel.achievements.sorted {
-                if $0.type == $1.type {
-                    return $0.requirement < $1.requirement
-                } else {
+        NavigationStack {
+            ZStack {
+                Color(.systemGray6).ignoresSafeArea()
+
+                let sorted = viewModel.achievements.sorted {
+                    if $0.type == $1.type { return $0.requirement < $1.requirement }
                     return $0.type.rawValue < $1.type.rawValue
                 }
-            }
-            let grouped = Dictionary(grouping: sortedAchievements, by: { $0.type })
-            let orderedTypes: [Achievement.AchievementType] = [.streak, .totalMinutes, .totalExercises]
+                let grouped = Dictionary(grouping: sorted, by: { $0.type })
+                let ordered: [Achievement.AchievementType] = [.streak, .totalMinutes, .totalExercises]
 
-            List {
-                ForEach(orderedTypes, id: \.self) { type in
-                    if let achievementsForType = grouped[type] {
-                        Section(header: Text(type.rawValue.capitalized)) {
-                            ForEach(achievementsForType, id: \.id) { achievement in
-                                NavigationLink(destination: AchievementDetailView(achievement: achievement)) {
-                                    AchievementRowView(achievement: achievement)
+                List {
+                    ForEach(ordered, id: \.self) { type in
+                        if let group = grouped[type] {
+                            Section(header: Text(type.rawValue.capitalized)) {
+                                ForEach(group, id: \.id) { achievement in
+                                    let progress = progressViewModel.progressValue(for: achievement)
+                                    NavigationLink {
+                                        AchievementDetailView(achievement: achievement, currentProgress: progress)
+                                    } label: {
+                                        AchievementRowView(achievement: achievement, currentProgress: progress)
+                                    }
                                 }
                             }
                         }
                     }
                 }
+                .listStyle(.insetGrouped)
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Achievements")
-            // Toolbar for demo achievement button
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack {
-                        Button("Add Demo Achievements") {
-                            addDemoAchievements()
-                        }
-                        Button("Delete All") {
-                            deleteAllAchievements()
-                        }
+                    Menu {
+                        Button("Add Demo Achievements", action: addDemoAchievements)
+                        Button("Delete All", role: .destructive, action: deleteAllAchievements)
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
-            // Fetch achievements when view appears
             .onAppear {
                 viewModel.fetchAchievements()
+                progressViewModel.refreshProgress()
             }
         }
     }

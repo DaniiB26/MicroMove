@@ -171,6 +171,19 @@ class ProgressViewModel: ObservableObject {
         }
     }
 
+    /// Returns the current progress count toward a given achievement's requirement.
+    func progressValue(for achievement: Achievement) -> Int {
+        switch achievement.type {
+        case .streak:
+            // Reflect the same logic used to unlock: consider longest and current.
+            return max(currentStreak, longestStreak)
+        case .totalExercises:
+            return workoutSessions.reduce(0) { $0 + $1.exercises.count }
+        case .totalMinutes:
+            return workoutSessions.reduce(0) { $0 + $1.duration }
+        }
+    }
+
     func recentExercises(limit: Int = 5, uniqueByExercise: Bool = true) -> [Exercise] {
         var items: [(exercise: Exercise, key: Date)] = []
 

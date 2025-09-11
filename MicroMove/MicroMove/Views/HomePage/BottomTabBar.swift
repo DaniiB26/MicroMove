@@ -88,7 +88,8 @@ struct BottomTabBar: View {
             //     )
             // }
             AchievementListView(
-                viewModel: achievementsViewModel
+                viewModel: achievementsViewModel,
+                progressViewModel: progressViewModel
             )
             .tabItem {
                 Label("Achievements", systemImage: "medal")
