@@ -6,6 +6,7 @@ struct OnBoardingPage: View {
 
     var onFinished: () -> Void = {}
 
+    @State private var name: String = ""
     @State private var selectedLevel: FitnessLevel? = nil
     @State private var selectedGoal: FitnessGoal? = nil
     @State private var showError = false
@@ -23,7 +24,7 @@ struct OnBoardingPage: View {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("Welcome!")
                                 .font(.largeTitle.bold())
-                            Text("Let’s tailor your workouts. Pick your level and your main goal.")
+                            Text("Let's tailor your workouts. Pick your level and your main goal.")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -41,6 +42,15 @@ struct OnBoardingPage: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 12)
+
+                    // Name Card
+                    Card {
+                        VStack(alignment: .leading, spacing: 12) {
+                            SectionHeader(title: "Set Your Name")
+                            NameSetter(name: $name)
+
+                        }
+                    }
 
                     // Level Card
                     Card {
@@ -89,6 +99,8 @@ struct OnBoardingPage: View {
                         showError = true
                         return
                     }
+                    let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                    userPreferencesViewModel.userName = trimmedName
                     userPreferencesViewModel.fitnessLevel = level
                     userPreferencesViewModel.fitnessGoal = goal
                     userPreferencesViewModel.savePreferences()
@@ -108,6 +120,21 @@ struct OnBoardingPage: View {
         .alert("Please select your level and goal", isPresented: $showError) {
             Button("OK", role: .cancel) {}
         }
+    }
+}
+
+private struct NameSetter: View {
+    @Binding var name: String
+
+    var body: some View {
+        TextField("Your name", text: $name)
+            .padding(12)
+            .background(Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
+            )
     }
 }
 
