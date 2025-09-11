@@ -32,6 +32,86 @@ class ExercisesViewModel: ObservableObject {
         }
     }
 
+    func seedDefaultExercisesIfNeeded() {
+        let flagKey = "didSeedDefaultExercises"
+        if UserDefaults.standard.bool(forKey: flagKey) {
+            return
+        }
+        // If store already has exercises, don't seed.
+        if !exercises.isEmpty { return }
+
+        let airBike = Exercise(
+            name: "Air Bike",
+            exerciseDesc: "A core exercise that targets the abs and obliques, performed by pedaling your legs in the air while alternating elbow-to-knee touches.",
+            type: .cardio,
+            bodyPart: .core,
+            difficulty: .beginner,
+            duration: 2,
+            isCompleted: false,
+            image: "airbike_logo",
+            instructions: [
+                "Lie flat on the floor with your lower back pressed to the ground. For this exercise, you will need to put your hands beside your head. Be careful however to not strain with the neck as you perform it. Now lift your shoulders into the crunch position.",
+                "Bring knees up to where they are perpendicular to the floor, with your lower legs parallel to the floor. This will be your starting position.",
+                "Now simultaneously, slowly go through a cycle pedal motion kicking forward with the right leg and bringing in the knee of the left leg. Bring your right elbow close to your left knee by crunching to the side, as you breathe out.",
+                "Go back to the initial position as you breathe in.",
+                "Crunch to the opposite side as you cycle your legs and bring closer your left elbow to your right knee and exhale.",
+                "Continue alternating in this manner until all of the recommended repetitions for each side have been completed."
+            ],
+            visualGuide: ["airbike_0", "airbike_1"],
+            supportsReps: false,
+            supportsWeight: false,
+            supportsTimer: true
+        )
+
+        let pushUp = Exercise(
+            name: "Push-Up",
+            exerciseDesc: "A basic push-up",
+            type: .strength,
+            bodyPart: .chest,
+            difficulty: .beginner,
+            duration: 1,
+            isCompleted: false,
+            image: "pushup_logo",
+            instructions: [
+                "Lie on the floor face down and place your hands about 36 inches apart while holding your torso up at arms length.",
+                "Next, lower yourself downward until your chest almost touches the floor as you inhale.",
+                "Now breathe out and press your upper body back up to the starting position while squeezing your chest.",
+                "After a brief pause at the top contracted position, you can begin to lower yourself downward again for as many repetitions as needed."
+            ],
+            visualGuide: ["pushups_0", "pushups_1"],
+            supportsReps: true,
+            supportsWeight: false,
+            supportsTimer: false
+        )
+
+        let curls = Exercise(
+            name: "Dumbbell Bicep Curl",
+            exerciseDesc: "A basic arm exercise where you curl dumbbells upward to work the biceps.",
+            type: .strength,
+            bodyPart: .arms,
+            difficulty: .beginner,
+            duration: 2,
+            isCompleted: false,
+            image: "dumbbell_bicep_curl_logo",
+            instructions: [
+                "Stand up straight with a dumbbell in each hand at arm's length. Keep your elbows close to your torso and rotate the palms of your hands until they are facing forward. This will be your starting position.",
+                "Now, keeping the upper arms stationary, exhale and curl the weights while contracting your biceps. Continue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level. Hold the contracted position for a brief pause as you squeeze your biceps.",
+                "Then, inhale and slowly begin to lower the dumbbells back to the starting position.",
+                "Repeat for the recommended amount of repetitions."
+            ],
+            visualGuide: ["dumbbell_bicep_curl_0", "dumbbell_bicep_curl_1"],
+            supportsReps: false,
+            supportsWeight: true,
+            supportsTimer: false
+        )
+
+        addExercise(airBike)
+        addExercise(pushUp)
+        addExercise(curls)
+        // Persist to store
+        try? modelContext.save()
+        UserDefaults.standard.set(true, forKey: flagKey)
+    }
     /// Fetches all exercises from the data store.
     func fetchExercises() {
         do {
