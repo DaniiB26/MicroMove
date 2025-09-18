@@ -25,6 +25,7 @@ struct MicroMoveApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView(modelContext: sharedModelContainer.mainContext)
+                .preferredColorScheme(.light)
                 .onAppear{
                     // Share ActivityLogViewModel with AppDelegate for notification response logging
                     let activityLogViewModel = ActivityLogViewModel(modelContext: sharedModelContainer.mainContext)
