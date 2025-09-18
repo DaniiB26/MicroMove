@@ -52,4 +52,36 @@ class AchievementsViewModel: ObservableObject {
             errorMessage = "Error deleting achievement: \(error.localizedDescription)"
         }
     }
+
+    /// Seeds a default set of achievements on first launch if none exist.
+    func seedDefaultAchievementsIfNeeded() {
+        let flagKey = "didSeedDefaultAchievements"
+        if UserDefaults.standard.bool(forKey: flagKey) { return }
+
+        // Ensure we have the latest snapshot
+        fetchAchievements()
+
+        // If store already has achievements, don't seed
+        if !achievements.isEmpty { return }
+
+        let streaks = [3, 7, 14, 30, 100]
+        let minutes = [10, 30, 60, 120, 300]
+        let exercises = [5, 10, 25, 50, 100]
+
+        let allAchievements: [Achievement] =
+            streaks.map { Achievement(title: "Streak: \($0) days", achievementDesc: "Complete a workout \($0) days in a row.", type: .streak, requirement: $0) } +
+            minutes.map { Achievement(title: "Minutes: \($0)", achievementDesc: "Accumulate \($0) total minutes of exercise.", type: .totalMinutes, requirement: $0) } +
+            exercises.map { Achievement(title: "Exercises: \($0)", achievementDesc: "Complete \($0) exercises.", type: .totalExercises, requirement: $0) }
+
+        for achievement in allAchievements {
+            // Avoid duplicates by checking title + type
+            if !achievements.contains(where: { $0.title == achievement.title && $0.type == achievement.type }) {
+                addAchievement(achievement)
+            }
+        }
+
+        // Persist to store and set flag
+        try? modelContext.save()
+        UserDefaults.standard.set(true, forKey: flagKey)
+    }
 }

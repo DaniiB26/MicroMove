@@ -11,8 +11,8 @@ struct ExerciseDetailView: View {
     @State private var showWeight = false
     @State private var showReps = false
     @State private var currentGuideIndex = 0
-    @State private var showGuide = false
     var activityMonitor: ActivityMonitor? = nil
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
@@ -20,77 +20,79 @@ struct ExerciseDetailView: View {
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 16) {
-                    // Hero Header
-                    ZStack(alignment: .bottom) {
-                        headerImage
-                            .resizable()
-                            .scaledToFill()
-                            .clipped()
-                            .overlay(
-                                LinearGradient(
-                                    colors: [.clear, .black.opacity(0.5)],
-                                    startPoint: .center,
-                                    endPoint: .top
-                                )
-                            )
-                        
-                        VStack {
-                            // Play Button
-                            Button {
-                                showGuide = true
-                            } label: {
-                                Label("Play video", systemImage: "play.fill")
-                                    .font(.subheadline.weight(.semibold))
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 8)
-                                    .background(.black)
-                                    .clipShape(Capsule())
-                            }
-                            .foregroundColor(.white)
-                            .padding(.bottom, 14)
-
-                            HStack(spacing: 20) {
-                                chip(text: exercise.type.rawValue.capitalized)
-                                Spacer()
-                                chip(text: exercise.bodyPart.rawValue.capitalized)
-                                Spacer()
-                                chip(text: "\(exercise.duration) min")
+                    // Overview Card
+                    VStack(spacing: 12) {
+                        HStack(alignment: .center, spacing: 12) {
+                            VStack(spacing: 4) {
+                                Text(exercise.name)
+                                    .font(.title3).bold()
+                                Text(exercise.exerciseDesc)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
                             }
                         }
+                        .frame(maxWidth: .infinity)
+
+                        // Tags row
+                        HStack(spacing: 8) {
+                            tag(text: exercise.type.rawValue)
+                            tag(text: exercise.bodyPart.rawValue)
+                            tag(text: exercise.difficulty.display)
+                            tag(text: "\(exercise.duration) min")
+                        }
                     }
-                    
-                    // Instructions
+                    .padding(16)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(radius: 1)
+                    .padding(.horizontal, 16)
+
+                    VStack(spacing: 0) {
+                        ExerciseGuideSheet(
+                            images: exercise.visualGuide,
+                            startIndex: currentGuideIndex,
+                            embedded: true
+                        )
+                        .padding(16)
+                    }
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(radius: 1)
+                    .padding(.horizontal, 16)
+
+                    // Instructions Card
                     VStack(alignment: .leading, spacing: 16) {
-                        Text("\(exercise.name) instructions")
-                            .font(.title3).bold()
-                            .foregroundColor(.primary)
-                        
+                        Text("Instructions")
+                            .font(.headline)
                         VStack(alignment: .leading, spacing: 12) {
                             ForEach(Array(exercise.instructions.enumerated()), id: \.offset) { idx, step in
-                                HStack(alignment: .top, spacing: 10) {
-                                    Text("\(idx + 1).")
-                                        .font(.body.weight(.semibold))
+                                HStack(alignment: .top, spacing: 12) {
+                                    stepBadge(number: idx + 1)
                                     Text(step)
                                         .font(.body)
+                                        .foregroundColor(.primary)
                                 }
                             }
                         }
-                        .padding(.horizontal, 20)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
+                    .padding(16)
+                    .background(Color.white)
+                    .cornerRadius(16)
+                    .shadow(radius: 1)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
                 }
             }
-            .edgesIgnoringSafeArea(.top)
         }
-        .navigationTitle(exercise.name)
-        .navigationBarTitleDisplayMode(.inline)
-
-        .fullScreenCover(isPresented: $showGuide) {
-            ExerciseGuideSheet(
-                images: exercise.visualGuide,
-                startIndex: currentGuideIndex
-            )
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.primary)
+                }
+            }
         }
         
         .safeAreaInset(edge: .bottom) {
@@ -156,23 +158,25 @@ struct ExerciseDetailView: View {
             )
         }
     }
-    private var headerImage: Image {
-        if !exercise.image.isEmpty {
-            return Image(exercise.image)         
-        }
-        if let first = exercise.visualGuide.first, !first.isEmpty {
-            return Image(first)
-        }
-        return Image(systemName: "figure.strengthtraining.traditional")
-    }
 
-    private func chip(text: String) -> some View {
+    // MARK: - UI helpers
+    private func tag(text: String) -> some View {
         Text(text)
-            .font(.subheadline.weight(.semibold))
-            .foregroundColor(.white)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 24)
+            .font(.caption.weight(.semibold))
+            .foregroundColor(.accentColor)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.accentColor.opacity(0.12))
             .clipShape(Capsule())
     }
-}
 
+
+    private func stepBadge(number: Int) -> some View {
+        Text("\(number)")
+            .font(.caption.weight(.bold))
+            .foregroundColor(.white)
+            .frame(width: 22, height: 22)
+            .background(Circle().fill(Color.accentColor))
+            .padding(.top, 2)
+    }
+}

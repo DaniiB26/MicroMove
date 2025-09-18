@@ -238,6 +238,8 @@ struct ContentView: View {
             showOnboarding = userPreferencesViewModel.userPreferences == nil
             exercisesViewModel.fetchExercises()
             exercisesViewModel.seedDefaultExercisesIfNeeded()
+            achievementsViewModel.fetchAchievements()
+            achievementsViewModel.seedDefaultAchievementsIfNeeded()
         }
         .sheet(isPresented: $showWeeklyCheckIn) {
             WeeklyCheckInPrompt(userPreferencesViewModel: userPreferencesViewModel) {

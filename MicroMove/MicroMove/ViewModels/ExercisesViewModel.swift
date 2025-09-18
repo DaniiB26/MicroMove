@@ -48,7 +48,7 @@ class ExercisesViewModel: ObservableObject {
             difficulty: .beginner,
             duration: 2,
             isCompleted: false,
-            image: "airbike_logo",
+            image: "Air_Bike/0.jpg",
             instructions: [
                 "Lie flat on the floor with your lower back pressed to the ground. For this exercise, you will need to put your hands beside your head. Be careful however to not strain with the neck as you perform it. Now lift your shoulders into the crunch position.",
                 "Bring knees up to where they are perpendicular to the floor, with your lower legs parallel to the floor. This will be your starting position.",
@@ -57,7 +57,7 @@ class ExercisesViewModel: ObservableObject {
                 "Crunch to the opposite side as you cycle your legs and bring closer your left elbow to your right knee and exhale.",
                 "Continue alternating in this manner until all of the recommended repetitions for each side have been completed."
             ],
-            visualGuide: ["airbike_0", "airbike_1"],
+            visualGuide: ["Air_Bike/0.jpg", "Air_Bike/1.jpg"],
             supportsReps: false,
             supportsWeight: false,
             supportsTimer: true
@@ -71,14 +71,14 @@ class ExercisesViewModel: ObservableObject {
             difficulty: .beginner,
             duration: 1,
             isCompleted: false,
-            image: "pushup_logo",
+            image: "Pushups/0.jpg",
             instructions: [
                 "Lie on the floor face down and place your hands about 36 inches apart while holding your torso up at arms length.",
                 "Next, lower yourself downward until your chest almost touches the floor as you inhale.",
                 "Now breathe out and press your upper body back up to the starting position while squeezing your chest.",
                 "After a brief pause at the top contracted position, you can begin to lower yourself downward again for as many repetitions as needed."
             ],
-            visualGuide: ["pushups_0", "pushups_1"],
+            visualGuide: ["Pushups/0.jpg", "Pushups/1.jpg"],
             supportsReps: true,
             supportsWeight: false,
             supportsTimer: false
@@ -92,14 +92,14 @@ class ExercisesViewModel: ObservableObject {
             difficulty: .beginner,
             duration: 2,
             isCompleted: false,
-            image: "dumbbell_bicep_curl_logo",
+            image: "Dumbbell_Bicep_Curl/0.jpg",
             instructions: [
                 "Stand up straight with a dumbbell in each hand at arm's length. Keep your elbows close to your torso and rotate the palms of your hands until they are facing forward. This will be your starting position.",
                 "Now, keeping the upper arms stationary, exhale and curl the weights while contracting your biceps. Continue to raise the weights until your biceps are fully contracted and the dumbbells are at shoulder level. Hold the contracted position for a brief pause as you squeeze your biceps.",
                 "Then, inhale and slowly begin to lower the dumbbells back to the starting position.",
                 "Repeat for the recommended amount of repetitions."
             ],
-            visualGuide: ["dumbbell_bicep_curl_0", "dumbbell_bicep_curl_1"],
+            visualGuide: ["Dumbbell_Bicep_Curl/0.jpg", "Dumbbell_Bicep_Curl/1.jpg"],
             supportsReps: false,
             supportsWeight: true,
             supportsTimer: false
